@@ -20,7 +20,8 @@ def create_app() -> FastAPI:
     app = FastAPI(
         title=settings.app_name,
         version="1.0.0",
-        lifespan=lifespan
+        lifespan=lifespan,
+        redirect_slashes=False
     )
     
     # CORS
