@@ -1,6 +1,6 @@
 from pydantic import BaseModel, field_validator
 from datetime import datetime
-from app.core.enums import Locale, CurriculumBoard
+from app.core.enums import Locale, CurriculumBoard, ELAStandardType
 
 class StandardBase(BaseModel):
     locale: Locale = Locale.US
@@ -9,6 +9,7 @@ class StandardBase(BaseModel):
     grade_range: str | None = None
     code: str
     description: str | None = None
+    ela_standard_type: ELAStandardType | None = None
 
 class StandardCreate(StandardBase):
     @field_validator('curriculum_board')
