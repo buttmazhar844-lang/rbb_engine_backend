@@ -16,7 +16,7 @@ from app.utils.pdf_generator import pdf_generator
 
 router = APIRouter()
 
-@router.post("/")
+@router.post("")
 async def create_product(product: ProductCreate, db: Session = Depends(get_db)):
     """Create new product"""
     try:
@@ -28,7 +28,7 @@ async def create_product(product: ProductCreate, db: Session = Depends(get_db)):
         logger.error(f"Error creating product: {e}")
         raise HTTPException(status_code=400, detail=str(e))
 
-@router.get("/")
+@router.get("")
 async def list_products(
     status: Optional[ProductStatus] = Query(None),
     template_type: Optional[TemplateType] = Query(None),

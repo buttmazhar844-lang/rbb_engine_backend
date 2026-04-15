@@ -11,7 +11,7 @@ from app.utils.logger import logger
 
 router = APIRouter()
 
-@router.post("/")
+@router.post("")
 async def create_generation_job(job: GenerationJobCreate, db: Session = Depends(get_db)):
     """Create new generation job"""
     try:
@@ -23,7 +23,7 @@ async def create_generation_job(job: GenerationJobCreate, db: Session = Depends(
         logger.error(f"Error creating generation job: {e}")
         raise HTTPException(status_code=400, detail=str(e))
 
-@router.get("/")
+@router.get("")
 async def list_generation_jobs(
     status: Optional[JobStatus] = Query(None),
     job_type: Optional[JobType] = Query(None),

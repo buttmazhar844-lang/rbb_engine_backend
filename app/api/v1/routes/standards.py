@@ -11,7 +11,7 @@ from app.utils.logger import logger
 
 router = APIRouter()
 
-@router.post("/")
+@router.post("")
 async def create_standard(standard: StandardCreate, db: Session = Depends(get_db)):
     """Create new educational standard"""
     try:
@@ -23,7 +23,7 @@ async def create_standard(standard: StandardCreate, db: Session = Depends(get_db
         logger.error(f"Error creating standard: {e}")
         raise HTTPException(status_code=400, detail=str(e))
 
-@router.get("/")
+@router.get("")
 async def list_standards(
     curriculum_board: Optional[CurriculumBoard] = Query(None),
     grade_level: Optional[GradeLevel] = Query(None),

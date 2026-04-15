@@ -92,7 +92,7 @@ _PREVIEWS = {
 }
 
 
-@router.get("/")
+@router.get("")
 async def get_available_templates():
     """Get list of available template types"""
     return {
