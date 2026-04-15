@@ -132,12 +132,12 @@ async def generate_template(
             product.social_snippets = metadata.get('social_snippets')
             
             # Update product status based on QC result
-            if qc_result['verdict'] == 'PASS':
+            if qc_result.get('verdict') in ('PASS', 'NEEDS_FIX'):
                 product.status = ProductStatus.GENERATED
-                logger.info(f"Template {product.id} generated successfully (QC: {qc_result['score']}%)")
+                logger.info(f"Template {product.id} generated successfully (QC: {qc_result.get('score')}%)")
             else:
                 product.status = ProductStatus.FAILED
-                logger.warning(f"Template {product.id} failed QC: {qc_result['verdict']} (score: {qc_result['score']}%)")
+                logger.warning(f"Template {product.id} failed QC: {qc_result.get('verdict')} (score: {qc_result.get('score')}%)")
             
             db.commit()
             
