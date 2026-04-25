@@ -75,9 +75,9 @@ async def generate_template(
             db.add(product)
             db.flush()  # Get product ID
             
-            # Create storage structure and stub files
+            # Create storage structure only (no stub files - real content saved after AI generation)
             try:
-                storage_manager.create_stub_files(product.id)
+                storage_manager.get_product_path(product.id)  # creates the directory
                 generate_stub_pdf(product.id, request.template_type.value)
                 generate_stub_thumbnail(product.id, request.template_type.value)
             except Exception as storage_error:

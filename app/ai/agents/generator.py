@@ -123,12 +123,17 @@ class GeneratorAgent:
             # Generate prompt using template
             user_prompt = template.generate_prompt(
                 ela_standard_code,
-                GradeLevel(grade_level),
+                GradeLevel(str(grade_level)),
                 WorldviewFlag(worldview_flag)
             )
             
             # Use template-specific system prompt
-            system_prompt = f"{BASE_SYSTEM_PROMPT}\n\nTemplate Type: {template_type}"
+            system_prompt = (
+                f"{BASE_SYSTEM_PROMPT}\n\n"
+                f"Template Type: {template_type}\n"
+                f"IMPORTANT: The 'title' field in your JSON output MUST exactly match "
+                f"the title shown in the OUTPUT FORMAT schema. Do NOT change it based on the standard."
+            )
             
             # Generate with Claude
             raw_output = await claude_client.generate(system_prompt, user_prompt)

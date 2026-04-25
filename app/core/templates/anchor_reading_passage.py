@@ -49,7 +49,9 @@ class AnchorReadingPassageTemplate(BaseTemplate):
         christian_guidelines = self.structure.christian_guidelines if worldview_flag == WorldviewFlag.CHRISTIAN else {}
         
         prompt = f"""
-Generate an Anchor Reading Passage for ELA Standard {standard_code}, Grade {grade_level}.
+Generate an Anchor Reading Passage for ELA Standard {standard_code}, Grade {grade_level.value}.
+
+CRITICAL: The "title" field in your JSON output must be the passage title (a creative story/article title), NOT the product type name.
 
 STRUCTURE REQUIREMENTS:
 - Title: Engaging, grade-appropriate (max 100 chars)
@@ -63,6 +65,12 @@ GRADE {grade_level} CONSTRAINTS:
 - Vocabulary: {constraints['vocabulary_complexity']}
 - Sentence complexity appropriate for grade level
 - Content engaging for middle school students
+
+FORMATTING RULES (strictly follow):
+- Passage text: continuous prose paragraphs separated by a single newline, no excessive blank lines
+- Key vocabulary: use format "Term: definition" (Camel Case for the term)
+- Discussion questions: plain numbered list, one per line
+- Do NOT use markdown, asterisks, or hyphens
 """
 
         if worldview_flag == WorldviewFlag.CHRISTIAN:
@@ -78,10 +86,14 @@ CHRISTIAN WORLDVIEW GUIDELINES:
 OUTPUT FORMAT (JSON):
 {
   "title": "passage title",
-  "passage_text": "full passage text",
+  "bundle_title": "[Standard Code] [Topic] Bundle",
+  "tagline": "[VERB PHRASE] | [VERB PHRASE] | [VERB PHRASE]",
+  "objectives": "\u2022 Objective one\n\u2022 Objective two\n\u2022 Objective three",
+  "directions": "Read the passage carefully. Pay attention to the main theme and key vocabulary.",
+  "passage_text": "full passage text with paragraphs separated by single newlines",
   "reading_level": "calculated level",
   "word_count": actual_count,
-  "key_vocabulary": ["term1: definition", "term2: definition"],
+  "key_vocabulary": ["Camel Case Term: definition", "Term Two: definition"],
   "main_theme": "central message",
   "discussion_questions": ["question1", "question2", "question3"]
 }

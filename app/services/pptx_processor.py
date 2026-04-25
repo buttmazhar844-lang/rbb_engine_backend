@@ -54,7 +54,7 @@ class PPTXProcessor:
         for run in runs[1:]:
             run._r.getparent().remove(run._r)
 
-    def _set_paragraphs(self, tf, text: str, font_pt: int, template_run_xml):
+    def _set_paragraphs(self, tf, text: str, font_pt: int, template_run_xml, bold: bool = None):
         txBody = tf._txBody
         for p in txBody.findall(qn('a:p')):
             txBody.remove(p)
@@ -67,19 +67,25 @@ class PPTXProcessor:
                     if orig_rPr is not None:
                         new_rPr = etree.fromstring(etree.tostring(orig_rPr))
                         new_rPr.set('sz', str(font_pt * 100))
+                        if bold is not None:
+                            new_rPr.set('b', '1' if bold else '0')
                         r_elem.insert(0, new_rPr)
                     else:
                         rPr = etree.SubElement(r_elem, qn('a:rPr'))
                         rPr.set('lang', 'en-US')
                         rPr.set('sz', str(font_pt * 100))
+                        if bold is not None:
+                            rPr.set('b', '1' if bold else '0')
                 else:
                     rPr = etree.SubElement(r_elem, qn('a:rPr'))
                     rPr.set('lang', 'en-US')
                     rPr.set('sz', str(font_pt * 100))
+                    if bold is not None:
+                        rPr.set('b', '1' if bold else '0')
                 t_elem = etree.SubElement(r_elem, qn('a:t'))
                 t_elem.text = line
 
-    def _fill_shape(self, shape, token: str, value: str, font_pt: int) -> bool:
+    def _fill_shape(self, shape, token: str, value: str, font_pt: int, bold: bool = None) -> bool:
         if not hasattr(shape, 'text_frame'):
             return False
         tf = shape.text_frame
@@ -99,11 +105,11 @@ class PPTXProcessor:
         w_in = shape.width  / 914400
         h_in = shape.height / 914400
         truncated = self._truncate_to_box(value, w_in, h_in, font_pt)
-        self._set_paragraphs(tf, truncated, font_pt, template_run_xml)
+        self._set_paragraphs(tf, truncated, font_pt, template_run_xml, bold)
         return True
 
     def _fill_slides(self, prs: Presentation, token_map: Dict[str, tuple]):
-        """Fill all slides in a presentation using the token→(value, font_pt) map."""
+        """Fill all slides using token→(value, font_pt) or token→(value, font_pt, bold) map."""
         for slide in prs.slides:
             for shape in slide.shapes:
                 if not hasattr(shape, 'text_frame'):
@@ -111,9 +117,11 @@ class PPTXProcessor:
                 raw = shape.text_frame.text
                 if any(skip in raw for skip in SKIP_TOKENS):
                     continue
-                for token, (value, fpt) in token_map.items():
+                for token, entry in token_map.items():
                     if token in raw:
-                        self._fill_shape(shape, token, value, fpt)
+                        value, fpt = entry[0], entry[1]
+                        bold = entry[2] if len(entry) > 2 else None
+                        self._fill_shape(shape, token, value, fpt, bold)
                         break
 
     def _save(self, prs: Presentation, product_id: int, filename: str) -> Path:
@@ -122,6 +130,56 @@ class PPTXProcessor:
         prs.save(str(output_path))
         logger.info(f"Saved -> {output_path}")
         return output_path
+
+    def _grade_suffix(self, grade) -> str:
+        """Return ordinal suffix for grade number."""
+        try:
+            g = int(grade)
+            return {1:'ST',2:'ND',3:'RD'}.get(g, 'TH')
+        except (ValueError, TypeError):
+            return 'TH'
+
+    def _header_line(self, grade, standard: str, bundle_title: str) -> str:
+        """Build the combined header line: e.g. '8TH GRADE RL.8.5 STRUCTURE & TEXT COMPARISON BUNDLE'
+        bundle_title from AI already contains the standard code, so we only prepend the grade.
+        """
+        try:
+            g = int(grade)
+            grade_str = f"{g}{self._grade_suffix(g)} GRADE"
+        except (ValueError, TypeError):
+            grade_str = f"GRADE {grade}"
+        # Strip the standard code from the start of bundle_title if AI included it
+        bt = bundle_title.strip()
+        if bt.upper().startswith(standard.upper()):
+            bt = bt[len(standard):].strip()
+        return f"{grade_str} {standard} {bt.upper()}"
+
+    def _strip_prefix(self, text: str, prefix: str) -> str:
+        """Strip a leading prefix (case-insensitive) and colon/space from text."""
+        t = text.strip()
+        p = prefix.lower().rstrip(': ')
+        if t.lower().startswith(p):
+            t = t[len(p):].lstrip(': ').strip()
+        return t
+
+    def _fmt_question(self, q: dict) -> str:
+        """Format a question dict into a display string with A-D options if present."""
+        text = q.get('question', '')
+        options = q.get('options', {})
+        if options:
+            opts = "\n".join(f"{k}. {v}" for k, v in options.items())
+            return f"{text}\n{opts}"
+        return text
+
+    def _fmt_answer(self, q: dict) -> str:
+        """Return the answer string from a question dict."""
+        return q.get('answer', '')
+
+    def _fmt_answer_short(self, q: dict) -> str:
+        """Return a compact answer for tight answer-key boxes (1-2 lines)."""
+        ans = q.get('answer', '')
+        # For MCQ answers like 'B - Some long text', keep only 'B - Some long text' but truncate
+        return ans[:120] if ans else ''
 
     # ------------------------------------------------------------------ #
     #  ANCHOR READING PASSAGE                                              #
@@ -133,41 +191,41 @@ class PPTXProcessor:
             raise FileNotFoundError(f"Template not found: {tpath}")
         prs = Presentation(str(tpath))
 
-        title    = content_data.get('title', 'Reading Passage')
-        passage  = content_data.get('passage_text', '')
-        theme    = content_data.get('main_theme', '')
-        dqs      = content_data.get('discussion_questions', [])
-        vocab    = content_data.get('key_vocabulary', [])
-        grade    = product_metadata.get('grade_level', 'N/A')
-        standard = product_metadata.get('ela_standard_code', 'N/A')
+        title      = content_data.get('title', 'Reading Passage')
+        passage    = content_data.get('passage_text', '')
+        theme      = content_data.get('main_theme', '')
+        dqs        = content_data.get('discussion_questions', [])
+        vocab      = content_data.get('key_vocabulary', [])
+        grade      = product_metadata.get('grade_level', 'N/A')
+        standard   = product_metadata.get('ela_standard_code', 'N/A')
+        bundle_title = content_data.get('bundle_title', title)
+        tagline    = content_data.get('tagline', '')
+        objectives = content_data.get('objectives', '')
+        directions = content_data.get('directions', '')
 
-        objectives = (
-            "\u2022 Analyze the central theme and message\n"
-            "\u2022 Understand key vocabulary in context\n"
-            "\u2022 Engage in critical thinking through discussion"
-        )
-        directions = (
-            "Read the passage carefully. Pay attention to the main theme "
-            "and key vocabulary. Be prepared to discuss the questions that follow."
-        )
-        dq_text    = "\n\n".join([f"\u2022 {q}" for q in dqs])   if dqs   else ""
-        vocab_text = "\n\n".join([f"\u2022 {v}" for v in vocab]) if vocab else ""
+        header_line = self._header_line(grade, standard, bundle_title)
+        dq_text     = "\n".join([f"\u2022 {q}" for q in dqs])   if dqs   else ""
+        vocab_text  = "\n".join([f"\u2022 {v}" for v in vocab]) if vocab else ""
         parts = []
         if dq_text:
-            parts.append("Discussion Questions:\n\n" + dq_text)
+            parts.append("Discussion Questions:\n" + dq_text)
         if vocab_text:
-            parts.append("Key Vocabulary:\n\n" + vocab_text)
-        combined = "\n\n\n".join(parts)
+            parts.append("Key Vocabulary:\n" + vocab_text)
+        combined = "\n\n".join(parts)
 
         token_map = {
-            "{{ANCHOR_READING_PASSAGE_HEADER}}":        (title,                   14),
-            "{{ANCHOR_READING_PASSAGE_GRADE_INFO}}":    (f"Grade {grade}",        12),
-            "{{ANCHOR_READING_PASSAGE_STANDARD_INFO}}": (f"Standard: {standard}", 12),
-            "{{ANCHOR_READING_PASSAGE_OBJECTIVES}}":    (objectives,              10),
-            "{{ANCHOR_READING_PASSAGE_DIRECTIONS}}":    (directions,              10),
-            "{{ANCHOR_READING_PASSAGE_STORY_TITLE}}":   (title,                   13),
-            "{{ANCHOR_READING_PASSAGE_SUBTITLE}}":      (theme,                    9),
-            "{{ANCHOR_READING_PASSAGE_CONTENT}}":       (passage if len(prs.slides) < 3 else combined, 9),
+            # HEADER box: template is 18pt bold
+            "{{ANCHOR_READING_PASSAGE_HEADER}}":        (title,       18, True),
+            # GRADE_INFO / STANDARD_INFO: template is 14pt
+            "{{ANCHOR_READING_PASSAGE_GRADE_INFO}}":    (header_line, 14, False),
+            "{{ANCHOR_READING_PASSAGE_STANDARD_INFO}}": (tagline,     14, False),
+            # Objectives/Directions: template has static prefix, 12pt
+            "{{ANCHOR_READING_PASSAGE_OBJECTIVES}}":    (self._strip_prefix(objectives, 'Objectives'),  12, False),
+            "{{ANCHOR_READING_PASSAGE_DIRECTIONS}}":    (self._strip_prefix(directions, 'Directions'),  12, False),
+            # Story title: 12pt bold, subtitle 12pt
+            "{{ANCHOR_READING_PASSAGE_STORY_TITLE}}":   (title,       12, True),
+            "{{ANCHOR_READING_PASSAGE_SUBTITLE}}":      (theme,       12, False),
+            "{{ANCHOR_READING_PASSAGE_CONTENT}}":       (passage if len(prs.slides) < 3 else combined, 12, False),
         }
 
         # Slide 1 — header + passage preview
@@ -178,22 +236,24 @@ class PPTXProcessor:
             raw = shape.text_frame.text
             if any(skip in raw for skip in SKIP_TOKENS):
                 continue
-            for token, (value, fpt) in token_map.items():
+            for token, entry in token_map.items():
                 if token in raw:
-                    self._fill_shape(shape, token, value, fpt)
+                    value, fpt = entry[0], entry[1]
+                    bold = entry[2] if len(entry) > 2 else None
+                    self._fill_shape(shape, token, value, fpt, bold)
                     break
 
         # Slide 2 — full passage
         if len(prs.slides) > 1:
             for shape in prs.slides[1].shapes:
                 if hasattr(shape, 'text_frame') and "{{ANCHOR_READING_PASSAGE_CONTENT}}" in shape.text_frame.text:
-                    self._fill_shape(shape, "{{ANCHOR_READING_PASSAGE_CONTENT}}", passage, 10)
+                    self._fill_shape(shape, "{{ANCHOR_READING_PASSAGE_CONTENT}}", passage, 12, False)
 
         # Slide 3 — questions + vocab
         if len(prs.slides) > 2:
             for shape in prs.slides[2].shapes:
                 if hasattr(shape, 'text_frame') and "{{ANCHOR_READING_PASSAGE_CONTENT}}" in shape.text_frame.text:
-                    self._fill_shape(shape, "{{ANCHOR_READING_PASSAGE_CONTENT}}", combined, 10)
+                    self._fill_shape(shape, "{{ANCHOR_READING_PASSAGE_CONTENT}}", combined, 12, False)
 
         return self._save(prs, product_id, "anchor_reading_passage.pptx")
 
@@ -209,27 +269,33 @@ class PPTXProcessor:
 
         grade    = product_metadata.get('grade_level', 'N/A')
         standard = product_metadata.get('ela_standard_code', 'N/A')
+        bundle_title = content_data.get('bundle_title', 'Bundle Overview')
+        tagline  = content_data.get('tagline', '')
+        header_line = self._header_line(grade, standard, bundle_title)
 
         token_map = {
-            "{{BUNDLE_OVERVIEW_HEADER}}":           (content_data.get('title', 'Bundle Overview'),                          14),
-            "{{BUNDLE_OVERVIEW_GRADE_INFO}}":        (f"Grade {grade}",                                                      12),
-            "{{BUNDLE_OVERVIEW_STANDARD_INFO}}":     (f"Standard: {standard}",                                               12),
-            "{{STANDARD_ALIGNMENT_TITLE}}":          (content_data.get('standard_alignment_title', 'Standard Alignment'),    12),
-            "{{STANDARD_ALIGNMENT_CONTENT}}":        (content_data.get('standard_alignment_content', ''),                    10),
-            "{{STANDARD_BREAKDOWN_TITLE}}":          (content_data.get('standard_breakdown_title', 'Standard Breakdown'),    12),
-            "{{STANDARD_BREAKDOWN_CONTENT}}":        (content_data.get('standard_breakdown_content', ''),                    10),
-            "{{WHATS_INCLUDED_TITLE}}":              (content_data.get('whats_included_title', "What's Included"),           12),
-            "{{WHATS_INCLUDED_CONTENT}}":            (content_data.get('whats_included_content', ''),                        10),
-            "{{LEARNING_OBJECTIVES_TITLE}}":         (content_data.get('learning_objectives_title', 'Learning Objectives'),  12),
-            "{{LEARNING_OBJECTIVES_CONTENT}}":       (content_data.get('learning_objectives_content', ''),                   10),
-            "{{SUGGESTED_PACING_TITLE}}":            (content_data.get('suggested_pacing_title', 'Suggested Pacing'),        12),
-            "{{SUGGESTED_PACING_CONTENT}}":          (content_data.get('suggested_pacing_content', ''),                      10),
-            "{{MATERIALS_NEEDED_TITLE}}":            (content_data.get('materials_needed_title', 'Materials Needed'),        12),
-            "{{MATERIALS_NEEDED_CONTENT}}":          (content_data.get('materials_needed_content', ''),                      10),
-            "{{DIFFERENTIATION_TIPS_TITLE}}":        (content_data.get('differentiation_tips_title', 'Differentiation Tips'),12),
-            "{{DIFFERENTIATION_TIPS_CONTENT}}":      (content_data.get('differentiation_tips_content', ''),                  10),
-            "{{ASSESSMENT_OVERVIEW_TITLE}}":         (content_data.get('assessment_overview_title', 'Assessment Overview'),  12),
-            "{{{{ASSESSMENT_OVERVIEW_CONTENT}}":     (content_data.get('assessment_overview_content', ''),                   10),
+            # HEADER: 18pt bold
+            "{{BUNDLE_OVERVIEW_HEADER}}":           (bundle_title,                                                            18, True),
+            # GRADE_INFO / STANDARD_INFO: 14pt
+            "{{BUNDLE_OVERVIEW_GRADE_INFO}}":        (header_line,                                                            14, False),
+            "{{BUNDLE_OVERVIEW_STANDARD_INFO}}":     (tagline,                                                                14, False),
+            # Section titles: template is 12pt bold (h=0.3in)
+            "{{STANDARD_ALIGNMENT_TITLE}}":          (content_data.get('standard_alignment_title', 'Standard Alignment'),    12, True),
+            "{{STANDARD_ALIGNMENT_CONTENT}}":        (content_data.get('standard_alignment_content', ''),                    12, False),
+            "{{STANDARD_BREAKDOWN_TITLE}}":          (content_data.get('standard_breakdown_title', 'Standard Breakdown'),    12, True),
+            "{{STANDARD_BREAKDOWN_CONTENT}}":        (content_data.get('standard_breakdown_content', ''),                    12, False),
+            "{{WHATS_INCLUDED_TITLE}}":              (content_data.get('whats_included_title', "What's Included"),           12, True),
+            "{{WHATS_INCLUDED_CONTENT}}":            (content_data.get('whats_included_content', ''),                        12, False),
+            "{{LEARNING_OBJECTIVES_TITLE}}":         (content_data.get('learning_objectives_title', 'Learning Objectives'),  12, True),
+            "{{LEARNING_OBJECTIVES_CONTENT}}":       (content_data.get('learning_objectives_content', ''),                   12, False),
+            "{{SUGGESTED_PACING_TITLE}}":            (content_data.get('suggested_pacing_title', 'Suggested Pacing'),        12, True),
+            "{{SUGGESTED_PACING_CONTENT}}":          (content_data.get('suggested_pacing_content', ''),                      12, False),
+            "{{MATERIALS_NEEDED_TITLE}}":            (content_data.get('materials_needed_title', 'Materials Needed'),        12, True),
+            "{{MATERIALS_NEEDED_CONTENT}}":          (content_data.get('materials_needed_content', ''),                      12, False),
+            "{{DIFFERENTIATION_TIPS_TITLE}}":        (content_data.get('differentiation_tips_title', 'Differentiation Tips'),12, True),
+            "{{DIFFERENTIATION_TIPS_CONTENT}}":      (content_data.get('differentiation_tips_content', ''),                  12, False),
+            "{{ASSESSMENT_OVERVIEW_TITLE}}":         (content_data.get('assessment_overview_title', 'Assessment Overview'),  12, True),
+            "{{{{ASSESSMENT_OVERVIEW_CONTENT}}":     (content_data.get('assessment_overview_content', ''),                   12, False),
         }
         self._fill_slides(prs, token_map)
         return self._save(prs, product_id, "bundle_overview.pptx")
@@ -247,21 +313,31 @@ class PPTXProcessor:
         grade    = product_metadata.get('grade_level', 'N/A')
         standard = product_metadata.get('ela_standard_code', 'N/A')
         tickets  = content_data.get('tickets', [])
+        et_title = 'Exit Tickets'
+        tagline  = content_data.get('tagline', '')
+        header_line = self._header_line(grade, standard, content_data.get('bundle_title', et_title))
+
+        # Answer lines for student response boxes (0.91in = ~4 lines at 12pt)
+        answer_lines = "_" * 60 + "\n" + "_" * 60 + "\n" + "_" * 60
 
         token_map = {
-            "{{EXIT_TICKETS_HEADER}}":       (content_data.get('title', 'Exit Tickets'),    14),
-            "{{EXIT_TICKETS_GRADE_INFO}}":   (f"Grade {grade}",                             12),
-            "{{EXIT_TICKETS_STANDARD_INFO}}": (f"Standard: {standard}",                    12),
-            "{{EXIT_TICKETS_OBJECTIVES}}":   (content_data.get('objectives', ''),           10),
-            "{{EXIT_TICKETS_DIRECTIONS}}":   (content_data.get('directions', ''),           10),
-            "{{EXIT_TICKETS_ANSWER_KEY_TITLE}}": (content_data.get('answer_key_title', 'Answer Key'), 12),
+            # HEADER: 18pt bold
+            "{{EXIT_TICKETS_HEADER}}":        (et_title,    18, True),
+            # GRADE_INFO / STANDARD_INFO: 14pt
+            "{{EXIT_TICKETS_GRADE_INFO}}":    (header_line, 14, False),
+            "{{EXIT_TICKETS_STANDARD_INFO}}": (tagline,     14, False),
+            # Objectives/Directions: 12pt (template has static prefix)
+            "{{EXIT_TICKETS_OBJECTIVES}}":   (self._strip_prefix(content_data.get('objectives', ''), 'Objectives'),  12, False),
+            "{{EXIT_TICKETS_DIRECTIONS}}":   (self._strip_prefix(content_data.get('directions', ''), 'Directions'),  12, False),
+            # Answer key title: 16pt bold (template)
+            "{{EXIT_TICKETS_ANSWER_KEY_TITLE}}": (content_data.get('answer_key_title', 'Answer Key'), 16, True),
         }
         for i, ticket in enumerate(tickets[:5], start=1):
-            token_map[f"{{{{EXIT_TICKET_TITLE_{i}}}}}"]            = (ticket.get('title', ''),         11)
-            token_map[f"{{{{EXIT_TICKET_QUESTION_CONTENT_{i}}}}}"] = (ticket.get('question', ''),      10)
-            token_map[f"{{{{EXIT_TICKET_LINES_FOR_ANSWER_{i}}}}}"] = ('',                              10)
-            token_map[f"{{{{EXIT_TICKETS_SAMPLE_ANSWER_TITLE_{i}}}}}"]   = (ticket.get('title', ''),         11)
-            token_map[f"{{{{EXIT_TICKETS_SAMPLE_ANSWER_CONTENT_{i}}}}}"] = (ticket.get('sample_answer', ''), 10)
+            token_map[f"{{{{EXIT_TICKET_TITLE_{i}}}}}"]            = (ticket.get('title', ''),         12, True)
+            token_map[f"{{{{EXIT_TICKET_QUESTION_CONTENT_{i}}}}}"] = (ticket.get('question', ''),      12, False)
+            token_map[f"{{{{EXIT_TICKET_LINES_FOR_ANSWER_{i}}}}}"] = (answer_lines,                    12, False)
+            token_map[f"{{{{EXIT_TICKETS_SAMPLE_ANSWER_TITLE_{i}}}}}"]   = (ticket.get('title', ''),         12, True)
+            token_map[f"{{{{EXIT_TICKETS_SAMPLE_ANSWER_CONTENT_{i}}}}}"] = (ticket.get('sample_answer', ''), 12, False)
 
         self._fill_slides(prs, token_map)
         return self._save(prs, product_id, "exit_tickets.pptx")
@@ -279,20 +355,32 @@ class PPTXProcessor:
         grade     = product_metadata.get('grade_level', 'N/A')
         standard  = product_metadata.get('ela_standard_code', 'N/A')
         questions = content_data.get('questions', [])
+        rcq_title = 'Reading Comprehension Questions'
+        tagline   = content_data.get('tagline', '')
+        header_line = self._header_line(grade, standard, content_data.get('bundle_title', rcq_title))
 
         token_map = {
-            "{{READING_COMPREHENSION_QUESTIONS_HEADER}}":                  (content_data.get('title', 'Reading Comprehension Questions'), 14),
-            "{{READING_COMPREHENSION_QUESTIONS_GRADE_INFO}}":              (f"Grade {grade}",                                             12),
-            "{{READING_COMPREHENSION_QUESTIONS_STANDARD_INFO}}":           (f"Standard: {standard}",                                      12),
-            "{{READING_COMPREHENSION_QUESTIONS_OBJECTIVES}}":              (content_data.get('objectives', ''),                           10),
-            "{{READING_COMPREHENSION_QUESTIONS_DIRECTIONS}}":              (content_data.get('directions', ''),                           10),
-            "{{READING_COMPREHENSION_QUESTIONS_TYPE_OF_QUESTION_TITLE_1}}": (content_data.get('question_type_1_title', 'Literal Questions'),     12),
-            "{{READING_COMPREHENSION_QUESTIONS_TYPE_OF_QUESTION_TITLE_2}}": (content_data.get('question_type_2_title', 'Inferential Questions'), 12),
-            "{{READING_COMPREHENSION_QUESTIONS_ANSWER_KEY_TITLE}}":        (content_data.get('answer_key_title', 'Answer Key'),           12),
+            # HEADER: 17pt bold (template)
+            "{{READING_COMPREHENSION_QUESTIONS_HEADER}}":                   (rcq_title,   17, True),
+            # GRADE_INFO / STANDARD_INFO: 14pt
+            "{{READING_COMPREHENSION_QUESTIONS_GRADE_INFO}}":               (header_line, 14, False),
+            "{{READING_COMPREHENSION_QUESTIONS_STANDARD_INFO}}":            (tagline,     14, False),
+            # Objectives/Directions: 12pt
+            "{{READING_COMPREHENSION_QUESTIONS_OBJECTIVES}}":               (self._strip_prefix(content_data.get('objectives', ''), 'Objectives'),  12, False),
+            "{{READING_COMPREHENSION_QUESTIONS_DIRECTIONS}}":               (self._strip_prefix(content_data.get('directions', ''), 'Directions'),  12, False),
+            # Section titles: 12pt bold
+            "{{READING_COMPREHENSION_QUESTIONS_TYPE_OF_QUESTION_TITLE_1}}": (content_data.get('question_type_1_title', 'Multiple Choice Questions'), 12, True),
+            "{{READING_COMPREHENSION_QUESTIONS_TYPE_OF_QUESTION_TITLE_2}}": (content_data.get('question_type_2_title', 'Short & Extended Response'),  12, True),
+            # Answer key title: 14pt bold
+            "{{READING_COMPREHENSION_QUESTIONS_ANSWER_KEY_TITLE}}":         (content_data.get('answer_key_title', 'Answer Key'), 14, True),
         }
+        # Q1-5: MCQ in 1.11in boxes — 10pt fits question+4 options
+        # Q6-10: short/extended in 1.51-1.72in boxes — 11pt
+        # Answer key slide 3: 0.3-0.9in boxes — compact answer
         for i, q in enumerate(questions[:10], start=1):
-            token_map[f"{{{{READING_COMPREHENSION_QUESTION_CONTENT_{i}}}}}"]        = (q.get('question', ''), 10)
-            token_map[f"{{{{READING_COMPREHENSION_QUESTION_ANSWER_CONTENT_{i}}}}}"] = (q.get('answer', ''),   10)
+            fpt_q = 10 if i <= 5 else 11
+            token_map[f"{{{{READING_COMPREHENSION_QUESTION_CONTENT_{i}}}}}"]        = (self._fmt_question(q),     fpt_q, False)
+            token_map[f"{{{{READING_COMPREHENSION_QUESTION_ANSWER_CONTENT_{i}}}}}"] = (self._fmt_answer_short(q), 11,    False)
 
         self._fill_slides(prs, token_map)
         return self._save(prs, product_id, "reading_comprehension_questions.pptx")
@@ -310,18 +398,26 @@ class PPTXProcessor:
         grade     = product_metadata.get('grade_level', 'N/A')
         standard  = product_metadata.get('ela_standard_code', 'N/A')
         questions = content_data.get('questions', [])
+        sq_title  = 'Short Quiz'
+        tagline   = content_data.get('tagline', '')
+        header_line = self._header_line(grade, standard, content_data.get('bundle_title', sq_title))
 
         token_map = {
-            "{{SHORT_QUIZ_HEADER}}":          (content_data.get('title', 'Short Quiz'),          14),
-            "{{SHORT_QUIZ_GRADE_INFO}}":       (f"Grade {grade}",                                12),
-            "{{SHORT_QUIZ_STANDARD_INFO}}":    (f"Standard: {standard}",                         12),
-            "{{SHORT_QUIZ_OBJECTIVES}}":       (content_data.get('objectives', ''),              10),
-            "{{SHORT_QUIZ_DIRECTIONS}}":       (content_data.get('directions', ''),              10),
-            "{{SHORT_QUIZ_ANSWER_KEY_TITLE}}": (content_data.get('answer_key_title', 'Answer Key'), 12),
+            # HEADER: 18pt bold
+            "{{SHORT_QUIZ_HEADER}}":          (sq_title,    18, True),
+            # GRADE_INFO / STANDARD_INFO: 14pt
+            "{{SHORT_QUIZ_GRADE_INFO}}":       (header_line, 14, False),
+            "{{SHORT_QUIZ_STANDARD_INFO}}":    (tagline,     14, False),
+            # Objectives/Directions: 12pt
+            "{{SHORT_QUIZ_OBJECTIVES}}":       (self._strip_prefix(content_data.get('objectives', ''), 'Objectives'), 12, False),
+            "{{SHORT_QUIZ_DIRECTIONS}}":       (self._strip_prefix(content_data.get('directions', ''), 'Directions'),  12, False),
+            # Answer key title: 16pt bold
+            "{{SHORT_QUIZ_ANSWER_KEY_TITLE}}": (content_data.get('answer_key_title', 'Answer Key'), 16, True),
         }
         for i, q in enumerate(questions[:7], start=1):
-            token_map[f"{{{{SHORT_QUIZ_QUESTION_CONTENT_{i}}}}}"] = (q.get('question', ''), 10)
-            token_map[f"{{{{SHORT_QUIZ_ANSWER_CONTENT_{i}}}}}"]   = (q.get('answer', ''),   10)
+            # Q1-5 MCQ: 11pt fits in 1.51in box; Q6-7 short: 11pt
+            token_map[f"{{{{SHORT_QUIZ_QUESTION_CONTENT_{i}}}}}"] = (self._fmt_question(q), 11, False)
+            token_map[f"{{{{SHORT_QUIZ_ANSWER_CONTENT_{i}}}}}"]   = (self._fmt_answer(q),   11, False)
 
         self._fill_slides(prs, token_map)
         return self._save(prs, product_id, "short_quiz.pptx")
@@ -340,25 +436,43 @@ class PPTXProcessor:
         standard = product_metadata.get('ela_standard_code', 'N/A')
         words    = content_data.get('vocabulary_words', [])
         quiz_qs  = content_data.get('quiz_questions', [])
+        vp_title = 'Vocabulary Pack'
+        tagline  = content_data.get('tagline', '')
+        header_line = self._header_line(grade, standard, content_data.get('bundle_title', vp_title))
+
+        def _fmt_vocab_word(w: dict, idx: int) -> str:
+            word = w.get('word', '')
+            return f"Word {idx}: {word}"
 
         token_map = {
-            "{{VOCABULARY_PACK_HEADER}}":        (content_data.get('title', 'Vocabulary Pack'),          14),
-            "{{VOCABULARY_PACK_GRADE_INFO}}":     (f"Grade {grade}",                                     12),
-            "{{VOCABULARY_PACK_STANDARD_INFO}}":  (f"Standard: {standard}",                              12),
-            "{{VOCABULARY_PACK_OBJECTIVES}}":     (content_data.get('objectives', ''),                   10),
-            "{{VOCABULARY_PACK_DIRECTIONS}}":     (content_data.get('directions', ''),                   10),
-            "{{VOCABULARY_PACK_TITLE}}":          (content_data.get('title', 'Vocabulary Pack'),         13),
-            "{{VOCABULARY_QUIZ_HEADER}}":         (content_data.get('quiz_header', 'Vocabulary Quiz'),   13),
-            "{{VOCABULARY_QUIZ_DIRECTION}}":      (content_data.get('quiz_direction', ''),               10),
-            "{{VOCABULARY_QUIZ_ANSWER_KEY_TITLE}}": (content_data.get('answer_key_title', 'Answer Key'), 12),
+            # HEADER: 18pt bold
+            "{{VOCABULARY_PACK_HEADER}}":        (vp_title,    18, True),
+            # GRADE_INFO / STANDARD_INFO: 14pt
+            "{{VOCABULARY_PACK_GRADE_INFO}}":     (header_line, 14, False),
+            "{{VOCABULARY_PACK_STANDARD_INFO}}":  (tagline,     14, False),
+            # Objectives/Directions: 12pt
+            "{{VOCABULARY_PACK_OBJECTIVES}}":     (self._strip_prefix(content_data.get('objectives', ''), 'Objectives'), 12, False),
+            "{{VOCABULARY_PACK_DIRECTIONS}}":     (self._strip_prefix(content_data.get('directions', ''), 'Directions'),  12, False),
+            # Section title: 12pt bold
+            "{{VOCABULARY_PACK_TITLE}}":          (vp_title,                                           12, True),
+            # Quiz header: 12pt bold; direction: 12pt
+            "{{VOCABULARY_QUIZ_HEADER}}":         (content_data.get('quiz_header', 'Vocabulary Quiz'), 12, True),
+            "{{VOCABULARY_QUIZ_DIRECTION}}":      (content_data.get('quiz_direction', ''),             12, False),
+            # Answer key title: 16pt bold
+            "{{VOCABULARY_QUIZ_ANSWER_KEY_TITLE}}": (content_data.get('answer_key_title', 'Answer Key'), 16, True),
         }
         for i, w in enumerate(words[:10], start=1):
-            token_map[f"{{{{VOCABULARY_PACK_WORD_{i}}}}}"]               = (w.get('word', ''),       12)
-            token_map[f"{{{{VOCABULARY_PACK_DEFINITION_CONTENT_{i}}}}}"] = (w.get('definition', ''), 10)
-            token_map[f"{{{{VOCABULARY_PACK_SENTENCE_CONTENT_{i}}}}}"]   = (w.get('sentence', ''),   10)
+            # Word label: 12pt bold (h=0.3in = 1 line)
+            token_map[f"{{{{VOCABULARY_PACK_WORD_{i}}}}}"]               = (_fmt_vocab_word(w, i),   12, True)
+            # Definition: 12pt, h=0.3in = 1 line — keep concise
+            token_map[f"{{{{VOCABULARY_PACK_DEFINITION_CONTENT_{i}}}}}"] = (w.get('definition', ''), 12, False)
+            # Sentence: 12pt, h=0.71in = ~3 lines
+            token_map[f"{{{{VOCABULARY_PACK_SENTENCE_CONTENT_{i}}}}}"]   = (w.get('sentence', ''),   12, False)
         for i, q in enumerate(quiz_qs[:6], start=1):
-            token_map[f"{{{{VOCABULARY_QUIZ_QUESTION_CONTENT_{i}}}}}"] = (q.get('question', ''), 10)
-            token_map[f"{{{{VOCABULARY_QUIZ_ANSWER_CONTENT_{i}}}}}"]   = (q.get('answer', ''),   10)
+            # Quiz question boxes: 1.31in = ~6 lines at 10pt (MCQ needs 5 lines)
+            token_map[f"{{{{VOCABULARY_QUIZ_QUESTION_CONTENT_{i}}}}}"] = (self._fmt_question(q),     10, False)
+            # Answer boxes: 0.28in = 1 line
+            token_map[f"{{{{VOCABULARY_QUIZ_ANSWER_CONTENT_{i}}}}}"]   = (self._fmt_answer_short(q), 11, False)
 
         self._fill_slides(prs, token_map)
         return self._save(prs, product_id, "vocabulary_pack.pptx")
@@ -376,21 +490,30 @@ class PPTXProcessor:
         grade    = product_metadata.get('grade_level', 'N/A')
         standard = product_metadata.get('ela_standard_code', 'N/A')
         prompts  = content_data.get('prompts', [])
+        wp_title = 'Writing Prompts'
+        tagline  = content_data.get('tagline', '')
+        header_line = self._header_line(grade, standard, content_data.get('bundle_title', wp_title))
 
         token_map = {
-            "{{WRITING_PROMPT_PACK_HEADER}}":      (content_data.get('title', 'Writing Prompts'),          14),
-            "{{WRITING_PROMPT_PACK_GRADE_INFO}}":  (f"Grade {grade}",                                      12),
-            "{{WRITING_PROMPT_PACK_STANDARD_INFO}}": (f"Standard: {standard}",                             12),
-            "{{WRITING_PROMPT_PACK_OBJECTIVES}}":  (content_data.get('objectives', ''),                    10),
-            "{{WRITING_PROMPT_PACK_DIRECTIONS}}":  (content_data.get('directions', ''),                    10),
-            "{{WRITING_PROMPT_PACK_TITLE}}":       (content_data.get('title', 'Writing Prompts'),          13),
-            "{{WRITING_EXEMPLAR_TITLE}}":          (content_data.get('exemplar_title', 'Writing Exemplar'),12),
-            "{{WRITING_EXEMPLAR_SUBTITLE}}":       (content_data.get('exemplar_subtitle', 'Sample Response'), 11),
-            "{{WRITING_EXEMPLAR_CONTENT}}":        (content_data.get('exemplar_content', ''),               9),
+            # HEADER: 18pt bold
+            "{{WRITING_PROMPT_PACK_HEADER}}":      (wp_title,    18, True),
+            # GRADE_INFO / STANDARD_INFO: 14pt
+            "{{WRITING_PROMPT_PACK_GRADE_INFO}}":  (header_line, 14, False),
+            "{{WRITING_PROMPT_PACK_STANDARD_INFO}}": (tagline,   14, False),
+            # Objectives/Directions: 12pt
+            "{{WRITING_PROMPT_PACK_OBJECTIVES}}":  (self._strip_prefix(content_data.get('objectives', ''), 'Objectives'), 12, False),
+            "{{WRITING_PROMPT_PACK_DIRECTIONS}}":  (self._strip_prefix(content_data.get('directions', ''), 'Directions'),  12, False),
+            # Pack title: 12pt bold
+            "{{WRITING_PROMPT_PACK_TITLE}}":       (wp_title,                                               12, True),
+            # Exemplar title: 16pt bold; subtitle: 12pt bold
+            "{{WRITING_EXEMPLAR_TITLE}}":          (content_data.get('exemplar_title', 'Writing Exemplar'), 16, True),
+            "{{WRITING_EXEMPLAR_SUBTITLE}}":       (content_data.get('exemplar_subtitle', 'Sample Response'), 12, True),
+            "{{WRITING_EXEMPLAR_CONTENT}}":        (content_data.get('exemplar_content', ''),               12, False),
         }
         for i, p in enumerate(prompts[:3], start=1):
-            token_map[f"{{{{WRITING_PROMPT_TITLE_{i}}}}}"]   = (p.get('title', ''),   12)
-            token_map[f"{{{{WRITING_PROMPT_CONTENT_{i}}}}}"] = (p.get('content', ''), 10)
+            # Prompt titles: 12pt bold; content: 12pt
+            token_map[f"{{{{WRITING_PROMPT_TITLE_{i}}}}}"]   = (p.get('title', ''),   12, True)
+            token_map[f"{{{{WRITING_PROMPT_CONTENT_{i}}}}}"] = (p.get('content', ''), 12, False)
 
         self._fill_slides(prs, token_map)
         return self._save(prs, product_id, "writing_prompts.pptx")

@@ -50,10 +50,8 @@ class StorageManager:
         return zip_dir
     
     def create_stub_files(self, product_id: int) -> Dict[str, Path]:
-        """Create stub JSON files with placeholder content"""
+        """Create stub JSON files with placeholder content (metadata only, NOT raw.json)"""
         stub_data = {
-            "raw": {"product_id": product_id, "status": "stub", "type": "raw_data"},
-            "final": {"product_id": product_id, "status": "stub", "type": "final_output"},
             "metadata": {"product_id": product_id, "created_by": "stub_generator", "version": "1.0"}
         }
         

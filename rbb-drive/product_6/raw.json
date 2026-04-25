@@ -1,0 +1,75 @@
+{
+  "title": "Short Quiz",
+  "bundle_title": "RL.7.2 Theme and Central Idea Bundle",
+  "tagline": "Analyze Themes | Identify Central Ideas | Support with Evidence",
+  "objectives": "\u2022 Determine the theme or central idea of a literary text\n\u2022 Analyze the development of theme throughout the text\n\u2022 Cite textual evidence to support analysis of theme",
+  "directions": "Directions: Choose the best answer for questions 1-5. Write your response for questions 6-7.",
+  "answer_key_title": "Answer Key",
+  "questions": [
+    {
+      "number": 1,
+      "question": "What is the difference between theme and topic?",
+      "options": {
+        "A": "Theme is what the story is about; topic is the lesson learned",
+        "B": "Theme is the lesson or message; topic is what the story is about",
+        "C": "Theme and topic mean the same thing",
+        "D": "Theme is only found in fiction; topic is only found in nonfiction"
+      },
+      "answer": "B - Theme is the lesson or message; topic is what the story is about"
+    },
+    {
+      "number": 2,
+      "question": "Which of the following is NOT a common theme in literature?",
+      "options": {
+        "A": "Friendship conquers all challenges",
+        "B": "Hard work leads to success",
+        "C": "The story takes place in a school",
+        "D": "Growing up requires making difficult choices"
+      },
+      "answer": "C - The story takes place in a school"
+    },
+    {
+      "number": 3,
+      "question": "How does an author typically develop theme throughout a story?",
+      "options": {
+        "A": "By stating the theme directly in the first paragraph",
+        "B": "Through character actions, dialogue, and plot events",
+        "C": "By repeating the same sentence multiple times",
+        "D": "Only through the story's conclusion"
+      },
+      "answer": "B - Through character actions, dialogue, and plot events"
+    },
+    {
+      "number": 4,
+      "question": "When analyzing theme, which question should you ask yourself?",
+      "options": {
+        "A": "What genre is this story?",
+        "B": "Who is the main character?",
+        "C": "What lesson does the main character learn?",
+        "D": "How long is the story?"
+      },
+      "answer": "C - What lesson does the main character learn?"
+    },
+    {
+      "number": 5,
+      "question": "Which of these statements best represents a theme rather than a topic?",
+      "options": {
+        "A": "The story is about bullying",
+        "B": "Standing up for others takes courage",
+        "C": "Two students have a conflict",
+        "D": "The setting is a middle school"
+      },
+      "answer": "B - Standing up for others takes courage"
+    },
+    {
+      "number": 6,
+      "question": "Explain how a character's dialogue can reveal the theme of a story. Provide an example.",
+      "answer": "A character's dialogue can reveal theme through the words they speak and the lessons they express. For example, if a character says 'I learned that being honest is more important than being popular,' this dialogue directly reveals a theme about the importance of honesty and integrity."
+    },
+    {
+      "number": 7,
+      "question": "Describe how you would use textual evidence to support your analysis of a story's theme.",
+      "answer": "To support theme analysis with textual evidence, I would identify specific quotes, character actions, or plot events that demonstrate the theme. I would explain how each piece of evidence connects to the theme and shows its development throughout the story."
+    }
+  ]
+}

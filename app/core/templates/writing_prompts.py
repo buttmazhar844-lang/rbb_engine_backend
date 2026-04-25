@@ -31,24 +31,35 @@ class WritingPromptsTemplate(BaseTemplate):
                         worldview_flag: WorldviewFlag) -> str:
         christian = worldview_flag == WorldviewFlag.CHRISTIAN
         return f"""
-Generate a Writing Prompts Pack for ELA Standard {standard_code}, Grade {grade_level}.
+Generate a Writing Prompts Pack for ELA Standard {standard_code}, Grade {grade_level.value}.
+
+CRITICAL: The "title" field in your JSON output MUST be exactly "Writing Prompts". Do not change it.
 
 Include exactly 3 writing prompts and one writing exemplar response.
 
 {"Apply a Christian worldview: prompts should encourage reflection on faith, virtue, and purpose." if christian else ""}
 
+FORMATTING RULES (strictly follow):
+- Objectives use bullet points (\u2022), one per line, no blank lines between bullets
+- Prompt titles use Title Case
+- Prompt content is 2-4 sentences: context + task + guidance
+- Exemplar content is continuous prose, paragraphs separated by single newlines
+- Do NOT use markdown, asterisks, or hyphens for bullets
+
 OUTPUT FORMAT (JSON):
 {{
   "title": "Writing Prompts",
-  "objectives": "objectives text",
-  "directions": "directions text",
+  "bundle_title": "[Standard Code] [Topic] Bundle",
+  "tagline": "[VERB PHRASE] | [VERB PHRASE] | [VERB PHRASE]",
+  "objectives": "\u2022 Objective one\n\u2022 Objective two",
+  "directions": "Choose one prompt and write a well-organized response using evidence from the text.",
   "exemplar_title": "Writing Exemplar",
   "exemplar_subtitle": "Sample Response",
-  "exemplar_content": "full exemplar text",
+  "exemplar_content": "full exemplar text with paragraphs separated by single newlines",
   "prompts": [
-    {{"number": 1, "title": "...", "content": "..."}},
-    {{"number": 2, "title": "...", "content": "..."}},
-    {{"number": 3, "title": "...", "content": "..."}}
+    {{"number": 1, "title": "Prompt Title", "content": "..."}},
+    {{"number": 2, "title": "Prompt Title", "content": "..."}},
+    {{"number": 3, "title": "Prompt Title", "content": "..."}}
   ]
 }}
 """

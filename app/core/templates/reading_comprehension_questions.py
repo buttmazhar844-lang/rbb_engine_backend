@@ -31,26 +31,40 @@ class ReadingComprehensionQuestionsTemplate(BaseTemplate):
                         worldview_flag: WorldviewFlag) -> str:
         christian = worldview_flag == WorldviewFlag.CHRISTIAN
         return f"""
-Generate Reading Comprehension Questions for ELA Standard {standard_code}, Grade {grade_level}.
+Generate Reading Comprehension Questions for ELA Standard {standard_code}, Grade {grade_level.value}.
 
-Produce exactly 10 questions split into two types:
-- Type 1 (questions 1-5): Literal / recall questions
-- Type 2 (questions 6-10): Inferential / analytical questions
+CRITICAL: The "title" field in your JSON output MUST be exactly "Reading Comprehension Questions". Do not change it.
+
+Produce exactly 10 questions with mixed types:
+- Questions 1-5 (Literal): Multiple-choice with 4 options (A, B, C, D)
+- Questions 6-8 (Inferential): Short-response questions (2-4 sentence answer)
+- Questions 9-10 (Extended): Extended-response questions (paragraph answer)
 
 Each question must include the question text and a model answer.
 
 {"Apply a Christian worldview: themes of truth, wisdom, and character." if christian else ""}
 
+FORMATTING RULES (strictly follow):
+- MCQ questions MUST have 4 options labeled A, B, C, D
+- MCQ answer format: "A - [Answer Text]"
+- Short/extended response: provide a model answer
+- Objectives and directions use bullet points (\u2022), one per line
+- Do NOT use markdown, asterisks, or hyphens for bullets
+
 OUTPUT FORMAT (JSON):
 {{
   "title": "Reading Comprehension Questions",
-  "objectives": "objectives text",
-  "directions": "directions text",
-  "question_type_1_title": "Literal Questions",
-  "question_type_2_title": "Inferential Questions",
+  "bundle_title": "[Standard Code] [Topic] Bundle",
+  "tagline": "[VERB PHRASE] | [VERB PHRASE] | [VERB PHRASE]",
+  "objectives": "\u2022 Objective one\n\u2022 Objective two",
+  "directions": "Read each question carefully. Choose the best answer for questions 1-5. Write your response for questions 6-10.",
+  "question_type_1_title": "Multiple Choice Questions",
+  "question_type_2_title": "Short & Extended Response",
   "answer_key_title": "Answer Key",
   "questions": [
-    {{"number": 1, "question": "...", "answer": "..."}},
+    {{"number": 1, "question": "Question text?", "options": {{"A": "...", "B": "...", "C": "...", "D": "..."}}, "answer": "A - Answer Text"}},
+    {{"number": 6, "question": "Short response question?", "answer": "Model short answer here."}},
+    {{"number": 9, "question": "Extended response question?", "answer": "Model extended answer here."}},
     ...
   ]
 }}

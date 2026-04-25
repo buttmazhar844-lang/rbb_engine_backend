@@ -29,20 +29,31 @@ class ExitTicketsTemplate(BaseTemplate):
                         worldview_flag: WorldviewFlag) -> str:
         christian = worldview_flag == WorldviewFlag.CHRISTIAN
         return f"""
-Generate Exit Tickets for ELA Standard {standard_code}, Grade {grade_level}.
+Generate Exit Tickets for ELA Standard {standard_code}, Grade {grade_level.value}.
+
+CRITICAL: The "title" field in your JSON output MUST be exactly "Exit Tickets". Do not change it.
 
 Create exactly 5 exit tickets. Each ticket has a short title, a question, and a sample answer.
 
 {"Apply a Christian worldview: questions should encourage reflection on values and character." if christian else ""}
 
+FORMATTING RULES (strictly follow):
+- Objectives use bullet points (\u2022), one per line, no blank lines between bullets
+- Ticket titles use Title Case
+- Questions are clear and concise (1-2 sentences)
+- Sample answers are brief model responses (2-4 sentences)
+- Do NOT use markdown, asterisks, or hyphens for bullets
+
 OUTPUT FORMAT (JSON):
 {{
   "title": "Exit Tickets",
-  "objectives": "objectives text",
-  "directions": "directions text",
+  "bundle_title": "[Standard Code] [Topic] Bundle",
+  "tagline": "[VERB PHRASE] | [VERB PHRASE] | [VERB PHRASE]",
+  "objectives": "\u2022 Objective one\n\u2022 Objective two",
+  "directions": "Answer the question below in complete sentences.",
   "answer_key_title": "Answer Key",
   "tickets": [
-    {{"number": 1, "title": "...", "question": "...", "sample_answer": "..."}},
+    {{"number": 1, "title": "Ticket Title", "question": "...", "sample_answer": "..."}},
     ...
   ]
 }}
