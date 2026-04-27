@@ -38,25 +38,25 @@ class AnchorReadingPassageTemplate(BaseTemplate):
         prompt = f"""
 Generate an Anchor Reading Passage for ELA Standard {standard_code}, Grade {grade_level.value}.
 
-CRITICAL: The content is split across 3 slides. You must provide content for each slide separately.
+CRITICAL: Content is split across 3 slides. Each slide gets different content. NO repetition across slides.
 
 SLIDE STRUCTURE:
-- Slide 1 (cover page): Leave slide1_content as empty string "". The cover page already has title, objectives, directions, and story info — it does NOT need passage text.
-- Slide 2 (full passage): The complete passage from beginning to end — max 2700 chars
-- Slide 3 (questions): Discussion questions + key vocabulary — max 2700 chars
+- Slide 1 (cover page content box): Background context + Key Vocabulary ONLY
+- Slide 2 (reading page): The complete passage ONLY
+- Slide 3 (questions page): Discussion Questions ONLY — NO vocabulary here
 
 CRITICAL: Every field has a strict character limit. NEVER exceed it.
 
 FIELD LIMITS:
-- title: max 50 chars (story/article title)
+- title: max 50 chars
 - bundle_title: max 60 chars
 - tagline: max 65 chars (3 verb phrases separated by " | ")
 - objectives: max 220 chars (2 bullet points using •, one per line)
 - directions: max 220 chars (1-2 sentences)
-- main_theme: max 75 chars (one short sentence, no period)
-- slide1_content: must be empty string "" — the cover page has title, objectives, directions already
-- slide2_content: max 2700 chars — the COMPLETE passage ({constraints['word_count_range'][0]}-{constraints['word_count_range'][1]} words)
-- slide3_content: max 2700 chars — Discussion Questions section followed by Key Vocabulary section
+- main_theme: max 75 chars (one short sentence)
+- slide1_content: max 1800 chars — "About This Passage:" section + "Key Vocabulary:" section
+- slide2_content: max 2700 chars — complete passage ({constraints['word_count_range'][0]}-{constraints['word_count_range'][1]} words)
+- slide3_content: max 2700 chars — "Discussion Questions:" section ONLY, no vocabulary
 """
 
         if worldview_flag == WorldviewFlag.CHRISTIAN:
@@ -68,20 +68,6 @@ CHRISTIAN WORLDVIEW GUIDELINES:
 """
 
         prompt += """
-FORMAT FOR slide3_content (use exactly this structure):
-Discussion Questions:
-1. Question one here?
-2. Question two here?
-3. Question three here?
-4. Question four here?
-
-Key Vocabulary:
-• Term One: definition here
-• Term Two: definition here
-• Term Three: definition here
-• Term Four: definition here
-• Term Five: definition here
-
 OUTPUT FORMAT (JSON only, no markdown):
 {
   "title": "Story Title Here",
@@ -90,9 +76,9 @@ OUTPUT FORMAT (JSON only, no markdown):
   "objectives": "• Objective one here\\n• Objective two here",
   "directions": "Read the passage carefully and answer the questions that follow.",
   "main_theme": "One concise theme sentence here",
-  "slide1_content": "",
-  "slide2_content": "Complete passage text from beginning to end...",
-  "slide3_content": "Discussion Questions:\\n1. Question one?\\n2. Question two?\\n3. Question three?\\n4. Question four?\\n\\nKey Vocabulary:\\n• Term: definition\\n• Term: definition\\n• Term: definition\\n• Term: definition\\n• Term: definition"
+  "slide1_content": "About This Passage:\\n2-3 sentences of background context.\\n\\nKey Vocabulary:\\n• Term One: definition\\n• Term Two: definition\\n• Term Three: definition\\n• Term Four: definition\\n• Term Five: definition",
+  "slide2_content": "Complete passage text here...",
+  "slide3_content": "Discussion Questions:\\n1. Question one?\\n2. Question two?\\n3. Question three?\\n4. Question four?"
 }
 """
         return prompt

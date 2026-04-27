@@ -201,10 +201,26 @@ class PPTXProcessor:
         directions   = content_data.get('directions', '')
         theme        = content_data.get('main_theme', '')
 
-        # Claude provides content for each slide directly
+        # Support both new format (slide1/2/3_content) and old format (passage_text + discussion_questions)
         slide1_content = content_data.get('slide1_content', '')
         slide2_content = content_data.get('slide2_content', '')
         slide3_content = content_data.get('slide3_content', '')
+
+        # Fall back to old format if new fields are missing
+        if not slide2_content:
+            passage = content_data.get('passage_text', '')
+            dqs     = content_data.get('discussion_questions', [])
+            vocab   = content_data.get('key_vocabulary', [])
+            slide2_content = passage
+            # Slide 1: key vocabulary as pre-reading
+            if vocab:
+                vocab_preview = "\n".join([f"\u2022 {v}" for v in vocab])
+                slide1_content = f"Key Vocabulary:\n{vocab_preview}"
+            else:
+                slide1_content = ''
+            # Slide 3: discussion questions only (vocab already on slide 1)
+            dq_text = "\n".join([f"{i}. {q}" for i, q in enumerate(dqs, 1)]) if dqs else ""
+            slide3_content = f"Discussion Questions:\n{dq_text}" if dq_text else ""
 
         header_line = self._header_line(grade, standard, bundle_title)
 
