@@ -182,6 +182,65 @@ class PPTXProcessor:
         # For MCQ answers like 'B - Some long text', keep only 'B - Some long text' but truncate
         return ans[:120] if ans else ''
 
+    def _make_rPr(self, template_run_xml, font_pt: int, bold: bool = None):
+        """Build an rPr element cloned from template or fresh."""
+        from pptx.oxml.ns import qn as _qn
+        if template_run_xml is not None:
+            orig = template_run_xml.find(_qn('a:rPr'))
+            if orig is not None:
+                rPr = etree.fromstring(etree.tostring(orig))
+                rPr.set('sz', str(font_pt * 100))
+                if bold is not None:
+                    rPr.set('b', '1' if bold else '0')
+                return rPr
+        rPr = etree.Element(_qn('a:rPr'))
+        rPr.set('lang', 'en-US')
+        rPr.set('sz', str(font_pt * 100))
+        if bold is not None:
+            rPr.set('b', '1' if bold else '0')
+        return rPr
+
+    def _fill_label_box(self, shape, token: str, label: str, value: str, font_pt: int) -> bool:
+        """Fill a box rendering the label as bold and value as regular on the same first line."""
+        if not hasattr(shape, 'text_frame'):
+            return False
+        tf = shape.text_frame
+        tf.word_wrap = True
+        for para in tf.paragraphs:
+            self._merge_paragraph_runs(para)
+        if token not in tf.text:
+            return False
+        template_run_xml = None
+        for para in tf.paragraphs:
+            for run in para.runs:
+                if token in run.text:
+                    template_run_xml = run._r
+                    break
+            if template_run_xml is not None:
+                break
+        txBody = tf._txBody
+        for p in txBody.findall(qn('a:p')):
+            txBody.remove(p)
+        lines = value.split('\n') if value else ['']
+        for li, line in enumerate(lines):
+            p_elem = etree.SubElement(txBody, qn('a:p'))
+            if li == 0:
+                r_label = etree.SubElement(p_elem, qn('a:r'))
+                r_label.insert(0, self._make_rPr(template_run_xml, font_pt, bold=True))
+                t_label = etree.SubElement(r_label, qn('a:t'))
+                t_label.text = label
+                if line:
+                    r_val = etree.SubElement(p_elem, qn('a:r'))
+                    r_val.insert(0, self._make_rPr(template_run_xml, font_pt, bold=False))
+                    t_val = etree.SubElement(r_val, qn('a:t'))
+                    t_val.text = ' ' + line
+            elif line:
+                r_elem = etree.SubElement(p_elem, qn('a:r'))
+                r_elem.insert(0, self._make_rPr(template_run_xml, font_pt, bold=False))
+                t_elem = etree.SubElement(r_elem, qn('a:t'))
+                t_elem.text = line
+        return True
+
     # ------------------------------------------------------------------ #
     #  ANCHOR READING PASSAGE                                              #
     # ------------------------------------------------------------------ #
@@ -229,8 +288,8 @@ class PPTXProcessor:
             "{{ANCHOR_READING_PASSAGE_HEADER}}":        (title,        18, True),
             "{{ANCHOR_READING_PASSAGE_GRADE_INFO}}":    (header_line,  14, False),
             "{{ANCHOR_READING_PASSAGE_STANDARD_INFO}}": (tagline,      14, False),
-            "{{ANCHOR_READING_PASSAGE_OBJECTIVES}}":    (self._strip_prefix(objectives, 'Objectives'), 12, False),
-            "{{ANCHOR_READING_PASSAGE_DIRECTIONS}}":    (self._strip_prefix(directions, 'Directions'), 12, False),
+            "{{ANCHOR_READING_PASSAGE_OBJECTIVES}}":    (self._strip_prefix(objectives, 'Objectives'), 12, False, 'Objectives:'),
+            "{{ANCHOR_READING_PASSAGE_DIRECTIONS}}":    (self._strip_prefix(directions, 'Directions'), 12, False, 'Directions:'),
             "{{ANCHOR_READING_PASSAGE_STORY_TITLE}}":   (title,        12, True),
             "{{ANCHOR_READING_PASSAGE_SUBTITLE}}":      (theme,        12, False),
             "{{ANCHOR_READING_PASSAGE_CONTENT}}":       (slide1_content, 12, False),
@@ -246,8 +305,12 @@ class PPTXProcessor:
             for token, entry in slide1_map.items():
                 if token in raw:
                     value, fpt = entry[0], entry[1]
-                    bold = entry[2] if len(entry) > 2 else None
-                    self._fill_shape(shape, token, value, fpt, bold)
+                    bold  = entry[2] if len(entry) > 2 else None
+                    label = entry[3] if len(entry) > 3 else None
+                    if label is not None:
+                        self._fill_label_box(shape, token, label, value, fpt)
+                    else:
+                        self._fill_shape(shape, token, value, fpt, bold)
                     break
 
         # Fill slide 2 — full passage
