@@ -41,7 +41,7 @@ Generate an Anchor Reading Passage for ELA Standard {standard_code}, Grade {grad
 CRITICAL: The content is split across 3 slides. You must provide content for each slide separately.
 
 SLIDE STRUCTURE:
-- Slide 1 (cover page): Beginning of the passage only — max 1800 chars
+- Slide 1 (cover page): Leave slide1_content as empty string "". The cover page already has title, objectives, directions, and story info — it does NOT need passage text.
 - Slide 2 (full passage): The complete passage from beginning to end — max 2700 chars
 - Slide 3 (questions): Discussion questions + key vocabulary — max 2700 chars
 
@@ -54,7 +54,7 @@ FIELD LIMITS:
 - objectives: max 220 chars (2 bullet points using •, one per line)
 - directions: max 220 chars (1-2 sentences)
 - main_theme: max 75 chars (one short sentence, no period)
-- slide1_content: max 1800 chars — ONLY the passage text (first {constraints['word_count_range'][0]//2} words approx)
+- slide1_content: must be empty string "" — the cover page has title, objectives, directions already
 - slide2_content: max 2700 chars — the COMPLETE passage ({constraints['word_count_range'][0]}-{constraints['word_count_range'][1]} words)
 - slide3_content: max 2700 chars — Discussion Questions section followed by Key Vocabulary section
 """
@@ -90,7 +90,7 @@ OUTPUT FORMAT (JSON only, no markdown):
   "objectives": "• Objective one here\\n• Objective two here",
   "directions": "Read the passage carefully and answer the questions that follow.",
   "main_theme": "One concise theme sentence here",
-  "slide1_content": "Beginning of passage text here...",
+  "slide1_content": "",
   "slide2_content": "Complete passage text from beginning to end...",
   "slide3_content": "Discussion Questions:\\n1. Question one?\\n2. Question two?\\n3. Question three?\\n4. Question four?\\n\\nKey Vocabulary:\\n• Term: definition\\n• Term: definition\\n• Term: definition\\n• Term: definition\\n• Term: definition"
 }

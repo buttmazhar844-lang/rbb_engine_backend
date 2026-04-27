@@ -62,26 +62,27 @@ class PPTXProcessor:
             p_elem = etree.SubElement(txBody, qn('a:p'))
             if line:
                 r_elem = etree.SubElement(p_elem, qn('a:r'))
+                # Auto-bold lines that are section headings (end with ':')
+                # This takes priority over the bold parameter for heading detection
+                is_heading = line.rstrip().endswith(':')
+                line_bold = True if is_heading else (bold if bold is not None else False)
                 if template_run_xml is not None:
                     orig_rPr = template_run_xml.find(qn('a:rPr'))
                     if orig_rPr is not None:
                         new_rPr = etree.fromstring(etree.tostring(orig_rPr))
                         new_rPr.set('sz', str(font_pt * 100))
-                        if bold is not None:
-                            new_rPr.set('b', '1' if bold else '0')
+                        new_rPr.set('b', '1' if line_bold else '0')
                         r_elem.insert(0, new_rPr)
                     else:
                         rPr = etree.SubElement(r_elem, qn('a:rPr'))
                         rPr.set('lang', 'en-US')
                         rPr.set('sz', str(font_pt * 100))
-                        if bold is not None:
-                            rPr.set('b', '1' if bold else '0')
+                        rPr.set('b', '1' if line_bold else '0')
                 else:
                     rPr = etree.SubElement(r_elem, qn('a:rPr'))
                     rPr.set('lang', 'en-US')
                     rPr.set('sz', str(font_pt * 100))
-                    if bold is not None:
-                        rPr.set('b', '1' if bold else '0')
+                    rPr.set('b', '1' if line_bold else '0')
                 t_elem = etree.SubElement(r_elem, qn('a:t'))
                 t_elem.text = line
 
