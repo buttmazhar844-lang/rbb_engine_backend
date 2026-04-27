@@ -14,7 +14,7 @@ class ExitTicketsTemplate(BaseTemplate):
                 TemplateField(name="title", type="string", max_length=100),
                 TemplateField(name="objectives", type="string", max_length=300),
                 TemplateField(name="directions", type="string", max_length=300),
-                TemplateField(name="tickets", type="array"),  # list of 5 dicts: {title, question, sample_answer}
+                TemplateField(name="tickets", type="array"),
                 TemplateField(name="answer_key_title", type="string", max_length=100),
             ],
             christian_guidelines={},
@@ -31,30 +31,36 @@ class ExitTicketsTemplate(BaseTemplate):
         return f"""
 Generate Exit Tickets for ELA Standard {standard_code}, Grade {grade_level.value}.
 
-CRITICAL: The "title" field in your JSON output MUST be exactly "Exit Tickets". Do not change it.
-
-Create exactly 5 exit tickets. Each ticket has a short title, a question, and a sample answer.
-
+CRITICAL: The "title" field MUST be exactly "Exit Tickets". Do not change it.
 {"Apply a Christian worldview: questions should encourage reflection on values and character." if christian else ""}
 
-FORMATTING RULES (strictly follow):
-- Objectives use bullet points (\u2022), one per line, no blank lines between bullets
-- Ticket titles use Title Case
-- Questions are clear and concise (1-2 sentences)
-- Sample answers are brief model responses (2-4 sentences)
-- Do NOT use markdown, asterisks, or hyphens for bullets
+CRITICAL: Every field has a strict character limit. NEVER exceed it.
 
-OUTPUT FORMAT (JSON):
+FIELD LIMITS (characters including spaces):
+- title: exactly "Exit Tickets"
+- bundle_title: max 60 chars
+- tagline: max 65 chars (3 verb phrases separated by " | ")
+- objectives: max 220 chars (2 bullet points using •, one per line)
+- directions: max 220 chars (1-2 sentences)
+- answer_key_title: max 55 chars
+- Each ticket title: max 55 chars (Title Case)
+- Each ticket question: max 150 chars (1-2 sentences, fits in 2-line box)
+- Each ticket sample_answer: max 300 chars (2-3 sentences, fits in 4-line box)
+
+OUTPUT FORMAT (JSON only, no markdown):
 {{
   "title": "Exit Tickets",
-  "bundle_title": "[Standard Code] [Topic] Bundle",
-  "tagline": "[VERB PHRASE] | [VERB PHRASE] | [VERB PHRASE]",
-  "objectives": "\u2022 Objective one\n\u2022 Objective two",
+  "bundle_title": "{standard_code} [Topic] Bundle",
+  "tagline": "[Verb Phrase] | [Verb Phrase] | [Verb Phrase]",
+  "objectives": "• Objective one\\n• Objective two",
   "directions": "Answer the question below in complete sentences.",
   "answer_key_title": "Answer Key",
   "tickets": [
-    {{"number": 1, "title": "Ticket Title", "question": "...", "sample_answer": "..."}},
-    ...
+    {{"number": 1, "title": "Ticket Title Here", "question": "Question text here?", "sample_answer": "Sample answer here."}},
+    {{"number": 2, "title": "Ticket Title Here", "question": "Question text here?", "sample_answer": "Sample answer here."}},
+    {{"number": 3, "title": "Ticket Title Here", "question": "Question text here?", "sample_answer": "Sample answer here."}},
+    {{"number": 4, "title": "Ticket Title Here", "question": "Question text here?", "sample_answer": "Sample answer here."}},
+    {{"number": 5, "title": "Ticket Title Here", "question": "Question text here?", "sample_answer": "Sample answer here."}}
   ]
 }}
 """

@@ -191,69 +191,59 @@ class PPTXProcessor:
             raise FileNotFoundError(f"Template not found: {tpath}")
         prs = Presentation(str(tpath))
 
-        title      = content_data.get('title', 'Reading Passage')
-        passage    = content_data.get('passage_text', '')
-        theme      = content_data.get('main_theme', '')
-        dqs        = content_data.get('discussion_questions', [])
-        vocab      = content_data.get('key_vocabulary', [])
-        grade      = product_metadata.get('grade_level', 'N/A')
-        standard   = product_metadata.get('ela_standard_code', 'N/A')
+        title        = content_data.get('title', 'Reading Passage')
+        grade        = product_metadata.get('grade_level', 'N/A')
+        standard     = product_metadata.get('ela_standard_code', 'N/A')
         bundle_title = content_data.get('bundle_title', title)
-        tagline    = content_data.get('tagline', '')
-        objectives = content_data.get('objectives', '')
-        directions = content_data.get('directions', '')
+        tagline      = content_data.get('tagline', '')
+        objectives   = content_data.get('objectives', '')
+        directions   = content_data.get('directions', '')
+        theme        = content_data.get('main_theme', '')
+
+        # Claude provides content for each slide directly
+        slide1_content = content_data.get('slide1_content', '')
+        slide2_content = content_data.get('slide2_content', '')
+        slide3_content = content_data.get('slide3_content', '')
 
         header_line = self._header_line(grade, standard, bundle_title)
-        dq_text     = "\n".join([f"\u2022 {q}" for q in dqs])   if dqs   else ""
-        vocab_text  = "\n".join([f"\u2022 {v}" for v in vocab]) if vocab else ""
-        parts = []
-        if dq_text:
-            parts.append("Discussion Questions:\n" + dq_text)
-        if vocab_text:
-            parts.append("Key Vocabulary:\n" + vocab_text)
-        combined = "\n\n".join(parts)
 
-        token_map = {
-            # HEADER box: template is 18pt bold
-            "{{ANCHOR_READING_PASSAGE_HEADER}}":        (title,       18, True),
-            # GRADE_INFO / STANDARD_INFO: template is 14pt
-            "{{ANCHOR_READING_PASSAGE_GRADE_INFO}}":    (header_line, 14, False),
-            "{{ANCHOR_READING_PASSAGE_STANDARD_INFO}}": (tagline,     14, False),
-            # Objectives/Directions: template has static prefix, 12pt
-            "{{ANCHOR_READING_PASSAGE_OBJECTIVES}}":    (self._strip_prefix(objectives, 'Objectives'),  12, False),
-            "{{ANCHOR_READING_PASSAGE_DIRECTIONS}}":    (self._strip_prefix(directions, 'Directions'),  12, False),
-            # Story title: 12pt bold, subtitle 12pt
-            "{{ANCHOR_READING_PASSAGE_STORY_TITLE}}":   (title,       12, True),
-            "{{ANCHOR_READING_PASSAGE_SUBTITLE}}":      (theme,       12, False),
-            "{{ANCHOR_READING_PASSAGE_CONTENT}}":       (passage if len(prs.slides) < 3 else combined, 12, False),
+        # Slide 1 token map
+        slide1_map = {
+            "{{ANCHOR_READING_PASSAGE_HEADER}}":        (title,        18, True),
+            "{{ANCHOR_READING_PASSAGE_GRADE_INFO}}":    (header_line,  14, False),
+            "{{ANCHOR_READING_PASSAGE_STANDARD_INFO}}": (tagline,      14, False),
+            "{{ANCHOR_READING_PASSAGE_OBJECTIVES}}":    (self._strip_prefix(objectives, 'Objectives'), 12, False),
+            "{{ANCHOR_READING_PASSAGE_DIRECTIONS}}":    (self._strip_prefix(directions, 'Directions'), 12, False),
+            "{{ANCHOR_READING_PASSAGE_STORY_TITLE}}":   (title,        12, True),
+            "{{ANCHOR_READING_PASSAGE_SUBTITLE}}":      (theme,        12, False),
+            "{{ANCHOR_READING_PASSAGE_CONTENT}}":       (slide1_content, 12, False),
         }
 
-        # Slide 1 — header + passage preview
-        s1 = prs.slides[0]
-        for shape in s1.shapes:
+        # Fill slide 1
+        for shape in prs.slides[0].shapes:
             if not hasattr(shape, 'text_frame'):
                 continue
             raw = shape.text_frame.text
             if any(skip in raw for skip in SKIP_TOKENS):
                 continue
-            for token, entry in token_map.items():
+            for token, entry in slide1_map.items():
                 if token in raw:
                     value, fpt = entry[0], entry[1]
                     bold = entry[2] if len(entry) > 2 else None
                     self._fill_shape(shape, token, value, fpt, bold)
                     break
 
-        # Slide 2 — full passage
+        # Fill slide 2 — full passage
         if len(prs.slides) > 1:
             for shape in prs.slides[1].shapes:
                 if hasattr(shape, 'text_frame') and "{{ANCHOR_READING_PASSAGE_CONTENT}}" in shape.text_frame.text:
-                    self._fill_shape(shape, "{{ANCHOR_READING_PASSAGE_CONTENT}}", passage, 12, False)
+                    self._fill_shape(shape, "{{ANCHOR_READING_PASSAGE_CONTENT}}", slide2_content, 12, False)
 
-        # Slide 3 — questions + vocab
+        # Fill slide 3 — discussion questions + key vocabulary
         if len(prs.slides) > 2:
             for shape in prs.slides[2].shapes:
                 if hasattr(shape, 'text_frame') and "{{ANCHOR_READING_PASSAGE_CONTENT}}" in shape.text_frame.text:
-                    self._fill_shape(shape, "{{ANCHOR_READING_PASSAGE_CONTENT}}", combined, 12, False)
+                    self._fill_shape(shape, "{{ANCHOR_READING_PASSAGE_CONTENT}}", slide3_content, 12, False)
 
         return self._save(prs, product_id, "anchor_reading_passage.pptx")
 

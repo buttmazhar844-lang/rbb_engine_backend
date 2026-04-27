@@ -210,28 +210,27 @@ async def download_product_pptx(product_id: int, db: Session = Depends(get_db)):
         product_path = storage_manager.get_product_path(product_id)
         pptx_path = product_path / pptx_filename
 
-        # Generate on-the-fly if the file doesn't exist yet
-        if not pptx_path.exists():
-            raw_json_path = product_path / "raw.json"
-            if not raw_json_path.exists():
-                raise HTTPException(status_code=404, detail="Product content not found — cannot generate PPTX")
-            with open(raw_json_path, 'r') as f:
-                content_data = json.load(f)
-            product_metadata = {
-                'grade_level': product.grade_level.value,
-                'ela_standard_code': product.ela_standard_code,
-                'ela_standard_type': product.ela_standard_type.value,
-                'worldview_flag': product.worldview_flag.value,
-                'curriculum_board': product.curriculum_board.value,
-            }
-            from app.services.pptx_processor import pptx_processor
-            pptx_path = pptx_processor.process_template(
-                template_type=product.template_type.value,
-                content_data=content_data,
-                product_metadata=product_metadata,
-                product_id=product_id
-            )
-            logger.info(f"Generated PPTX on-the-fly for product {product_id}")
+        # Always regenerate from raw.json to apply latest formatting
+        raw_json_path = product_path / "raw.json"
+        if not raw_json_path.exists():
+            raise HTTPException(status_code=404, detail="Product content not found — cannot generate PPTX")
+        with open(raw_json_path, 'r') as f:
+            content_data = json.load(f)
+        product_metadata = {
+            'grade_level': product.grade_level.value,
+            'ela_standard_code': product.ela_standard_code,
+            'ela_standard_type': product.ela_standard_type.value,
+            'worldview_flag': product.worldview_flag.value,
+            'curriculum_board': product.curriculum_board.value,
+        }
+        from app.services.pptx_processor import pptx_processor
+        pptx_path = pptx_processor.process_template(
+            template_type=product.template_type.value,
+            content_data=content_data,
+            product_metadata=product_metadata,
+            product_id=product_id
+        )
+        logger.info(f"Generated PPTX for product {product_id}")
 
         filename = f"{product.template_type.value.lower()}_grade_{product.grade_level}_{product_id}.pptx"
         return FileResponse(

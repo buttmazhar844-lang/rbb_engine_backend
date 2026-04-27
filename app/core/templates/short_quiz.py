@@ -14,7 +14,7 @@ class ShortQuizTemplate(BaseTemplate):
                 TemplateField(name="title", type="string", max_length=100),
                 TemplateField(name="objectives", type="string", max_length=300),
                 TemplateField(name="directions", type="string", max_length=300),
-                TemplateField(name="questions", type="array"),  # list of 7 dicts: {question, answer}
+                TemplateField(name="questions", type="array"),
                 TemplateField(name="answer_key_title", type="string", max_length=100),
             ],
             christian_guidelines={},
@@ -31,31 +31,42 @@ class ShortQuizTemplate(BaseTemplate):
         return f"""
 Generate a Short Quiz for ELA Standard {standard_code}, Grade {grade_level.value}.
 
-CRITICAL: The "title" field in your JSON output MUST be exactly "Short Quiz". Do not change it.
-
-Create exactly 7 questions with mixed types:
-- Questions 1-5: Multiple-choice with 4 options (A, B, C, D)
-- Questions 6-7: Short-response questions (2-3 sentence model answer)
-
+CRITICAL: The "title" field MUST be exactly "Short Quiz". Do not change it.
 {"Apply a Christian worldview: questions should reflect values of truth and integrity." if christian else ""}
 
-FORMATTING RULES (strictly follow):
-- MCQ questions MUST have 4 options labeled A, B, C, D
-- MCQ answer format: "B - [Answer Text]"
-- Short-response answer: provide a model answer (2-3 sentences)
-- Objectives and directions use bullet points (\u2022), one per line
-- Do NOT use markdown, asterisks, or hyphens for bullets
+CRITICAL: Every field has a strict character limit. NEVER exceed it.
 
-OUTPUT FORMAT (JSON):
+QUESTION TYPES:
+- Questions 1-5: Multiple-choice with 4 options (A, B, C, D) — each fits in a 6-line box at 11pt
+- Questions 6-7: Short-response — each fits in a 6-line box at 11pt
+
+FIELD LIMITS (characters including spaces):
+- title: exactly "Short Quiz"
+- bundle_title: max 60 chars
+- tagline: max 65 chars (3 verb phrases separated by " | ")
+- objectives: max 220 chars (2 bullet points using •, one per line)
+- directions: max 220 chars (1-2 sentences)
+- answer_key_title: max 55 chars
+- Q1-5 question text: max 80 chars (short, leaves room for 4 options in the box)
+- Q1-5 each option (A/B/C/D): max 55 chars each
+- Q1-5 answer: max 70 chars (format: "B - Answer text")
+- Q6-7 question text: max 120 chars
+- Q6-7 answer: max 300 chars (2-3 sentences)
+
+OUTPUT FORMAT (JSON only, no markdown):
 {{
   "title": "Short Quiz",
-  "bundle_title": "[Standard Code] [Topic] Bundle",
-  "tagline": "[VERB PHRASE] | [VERB PHRASE] | [VERB PHRASE]",
-  "objectives": "\u2022 Objective one\n\u2022 Objective two",
+  "bundle_title": "{standard_code} [Topic] Bundle",
+  "tagline": "[Verb Phrase] | [Verb Phrase] | [Verb Phrase]",
+  "objectives": "• Objective one\\n• Objective two",
   "directions": "Directions: Choose the best answer for questions 1-5. Write your response for questions 6-7.",
   "answer_key_title": "Answer Key",
   "questions": [
-    {{"number": 1, "question": "Question text?", "options": {{"A": "...", "B": "...", "C": "...", "D": "..."}}, "answer": "B - Answer Text"}},
+    {{"number": 1, "question": "Short MCQ question?", "options": {{"A": "Option A", "B": "Option B", "C": "Option C", "D": "Option D"}}, "answer": "B - Option B"}},
+    {{"number": 2, "question": "Short MCQ question?", "options": {{"A": "Option A", "B": "Option B", "C": "Option C", "D": "Option D"}}, "answer": "A - Option A"}},
+    {{"number": 3, "question": "Short MCQ question?", "options": {{"A": "Option A", "B": "Option B", "C": "Option C", "D": "Option D"}}, "answer": "C - Option C"}},
+    {{"number": 4, "question": "Short MCQ question?", "options": {{"A": "Option A", "B": "Option B", "C": "Option C", "D": "Option D"}}, "answer": "D - Option D"}},
+    {{"number": 5, "question": "Short MCQ question?", "options": {{"A": "Option A", "B": "Option B", "C": "Option C", "D": "Option D"}}, "answer": "B - Option B"}},
     {{"number": 6, "question": "Short response question?", "answer": "Model answer here."}},
     {{"number": 7, "question": "Short response question?", "answer": "Model answer here."}}
   ]

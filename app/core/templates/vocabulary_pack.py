@@ -14,10 +14,10 @@ class VocabularyPackTemplate(BaseTemplate):
                 TemplateField(name="title", type="string", max_length=100),
                 TemplateField(name="objectives", type="string", max_length=300),
                 TemplateField(name="directions", type="string", max_length=300),
-                TemplateField(name="vocabulary_words", type="array"),  # list of 10 dicts: {word, definition, sentence}
+                TemplateField(name="vocabulary_words", type="array"),
                 TemplateField(name="quiz_header", type="string", max_length=100),
                 TemplateField(name="quiz_direction", type="string", max_length=200),
-                TemplateField(name="quiz_questions", type="array"),    # list of 6 dicts: {question, answer}
+                TemplateField(name="quiz_questions", type="array"),
                 TemplateField(name="answer_key_title", type="string", max_length=100),
             ],
             christian_guidelines={},
@@ -34,37 +34,56 @@ class VocabularyPackTemplate(BaseTemplate):
         return f"""
 Generate a Vocabulary Pack for ELA Standard {standard_code}, Grade {grade_level.value}.
 
-CRITICAL: The "title" field in your JSON output MUST be exactly "Vocabulary Pack". Do not change it.
-
-Include exactly 10 vocabulary words, each with a definition and an example sentence.
-Also include a 6-question vocabulary quiz with answers.
-
+CRITICAL: The "title" field MUST be exactly "Vocabulary Pack". Do not change it.
 {"Apply a Christian worldview: choose words that reflect virtue, wisdom, and character." if christian else ""}
 
-FORMATTING RULES (strictly follow):
-- Vocabulary word labels MUST use Camel Case: e.g. "Parallel Structure", "Frame Narrative"
-- Objectives: use bullet points (\u2022), one per line, no blank lines between bullets
-- Quiz questions MUST include 4 multiple-choice options labeled A, B, C, D
-- Answer format: "C - [Correct Term]"
-- Do NOT use markdown, asterisks, or hyphens for bullets
+CRITICAL: Every field has a strict character limit. NEVER exceed it.
 
-OUTPUT FORMAT (JSON):
+FIELD LIMITS (characters including spaces):
+- title: exactly "Vocabulary Pack"
+- bundle_title: max 60 chars
+- tagline: max 65 chars (3 verb phrases separated by " | ")
+- objectives: max 220 chars (2 bullet points using •, one per line)
+- directions: max 220 chars (1-2 sentences)
+- quiz_header: max 75 chars (e.g. "Vocabulary Quiz")
+- quiz_direction: max 75 chars (1 sentence)
+- answer_key_title: max 55 chars
+- Each word label: max 75 chars (format: "Word N: Term" using Camel Case, e.g. "Word 1: Parallel Structure")
+- Each definition: max 75 chars (one concise sentence — fits in 1-line box)
+- Each sentence: max 220 chars (1-2 sentences showing word in context — fits in 3-line box)
+- Each quiz question text: max 80 chars (short MCQ question)
+- Each quiz option (A/B/C/D): max 55 chars
+- Each quiz answer: max 75 chars (format: "C - Term")
+
+OUTPUT FORMAT (JSON only, no markdown):
 {{
   "title": "Vocabulary Pack",
-  "bundle_title": "[Standard Code] [Topic] Bundle",
-  "tagline": "[VERB PHRASE] | [VERB PHRASE] | [VERB PHRASE]",
-  "objectives": "\u2022 Objective one\n\u2022 Objective two",
-  "directions": "Study the key vocabulary terms and examples, then complete the quiz by selecting the best answer for each question.",
+  "bundle_title": "{standard_code} [Topic] Bundle",
+  "tagline": "[Verb Phrase] | [Verb Phrase] | [Verb Phrase]",
+  "objectives": "• Objective one\\n• Objective two",
+  "directions": "Study the key vocabulary terms and examples, then complete the quiz.",
   "quiz_header": "Vocabulary Quiz",
   "quiz_direction": "Directions: Choose the best answer for each question.",
   "answer_key_title": "Answer Key",
   "vocabulary_words": [
-    {{"number": 1, "word": "Camel Case Word", "definition": "...", "sentence": "..."}},
-    ...
+    {{"number": 1, "word": "Camel Case Term", "definition": "Concise definition here.", "sentence": "Example sentence using the term in context."}},
+    {{"number": 2, "word": "Camel Case Term", "definition": "Concise definition here.", "sentence": "Example sentence using the term in context."}},
+    {{"number": 3, "word": "Camel Case Term", "definition": "Concise definition here.", "sentence": "Example sentence using the term in context."}},
+    {{"number": 4, "word": "Camel Case Term", "definition": "Concise definition here.", "sentence": "Example sentence using the term in context."}},
+    {{"number": 5, "word": "Camel Case Term", "definition": "Concise definition here.", "sentence": "Example sentence using the term in context."}},
+    {{"number": 6, "word": "Camel Case Term", "definition": "Concise definition here.", "sentence": "Example sentence using the term in context."}},
+    {{"number": 7, "word": "Camel Case Term", "definition": "Concise definition here.", "sentence": "Example sentence using the term in context."}},
+    {{"number": 8, "word": "Camel Case Term", "definition": "Concise definition here.", "sentence": "Example sentence using the term in context."}},
+    {{"number": 9, "word": "Camel Case Term", "definition": "Concise definition here.", "sentence": "Example sentence using the term in context."}},
+    {{"number": 10, "word": "Camel Case Term", "definition": "Concise definition here.", "sentence": "Example sentence using the term in context."}}
   ],
   "quiz_questions": [
-    {{"number": 1, "question": "Question text here?", "options": {{"A": "...", "B": "...", "C": "...", "D": "..."}}, "answer": "C - Correct Term"}},
-    ...
+    {{"number": 1, "question": "Short MCQ question?", "options": {{"A": "Option A", "B": "Option B", "C": "Option C", "D": "Option D"}}, "answer": "C - Term"}},
+    {{"number": 2, "question": "Short MCQ question?", "options": {{"A": "Option A", "B": "Option B", "C": "Option C", "D": "Option D"}}, "answer": "A - Term"}},
+    {{"number": 3, "question": "Short MCQ question?", "options": {{"A": "Option A", "B": "Option B", "C": "Option C", "D": "Option D"}}, "answer": "B - Term"}},
+    {{"number": 4, "question": "Short MCQ question?", "options": {{"A": "Option A", "B": "Option B", "C": "Option C", "D": "Option D"}}, "answer": "D - Term"}},
+    {{"number": 5, "question": "Short MCQ question?", "options": {{"A": "Option A", "B": "Option B", "C": "Option C", "D": "Option D"}}, "answer": "C - Term"}},
+    {{"number": 6, "question": "Short MCQ question?", "options": {{"A": "Option A", "B": "Option B", "C": "Option C", "D": "Option D"}}, "answer": "A - Term"}}
   ]
 }}
 """
