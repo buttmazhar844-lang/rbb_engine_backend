@@ -1,0 +1,54 @@
+{
+  "verdict": "PASS",
+  "score": 85,
+  "evaluation": {
+    "structure": {
+      "score": 90,
+      "comments": "Content follows template structure well with clear title, objectives, directions, and organized slides. All required components present."
+    },
+    "alignment": {
+      "score": 88,
+      "comments": "Strong alignment with RI.6.1 standard. Questions effectively target citing textual evidence and making inferences. Discussion questions appropriately focus on evidence-based analysis."
+    },
+    "clarity": {
+      "score": 85,
+      "comments": "Clear, engaging writing appropriate for grade 6. Good use of vocabulary support. Some technical terms could benefit from simpler explanations."
+    },
+    "difficulty": {
+      "score": 82,
+      "comments": "Appropriate challenge level for grade 6. Complex scientific concepts presented accessibly, though some vocabulary (chemosynthesis, extremophiles) may need additional scaffolding."
+    },
+    "inclusivity": {
+      "score": 85,
+      "comments": "Culturally neutral content focused on scientific discovery. Accessible to diverse learners with vocabulary support provided."
+    },
+    "accuracy": {
+      "score": 90,
+      "comments": "Scientifically accurate information about hydrothermal vents, temperatures, and ecosystems. Appropriate connection to astrobiology research."
+    }
+  },
+  "issues": [
+    {
+      "category": "clarity",
+      "severity": "minor",
+      "description": "Term 'chemosynthesis' could benefit from a more detailed explanation for grade 6 students"
+    },
+    {
+      "category": "difficulty",
+      "severity": "minor",
+      "description": "Some technical vocabulary (extremophiles, mineral deposits) may need additional context or examples"
+    },
+    {
+      "category": "structure",
+      "severity": "minor",
+      "description": "Discussion questions could include one or two easier warm-up questions before the more complex analysis questions"
+    }
+  ],
+  "strengths": [
+    "Engaging, scientifically accurate content that captures student interest",
+    "Strong alignment with citing evidence standard through well-crafted discussion questions",
+    "Appropriate grade-level complexity with good vocabulary support",
+    "Clear progression from basic facts to inference-making",
+    "Culturally neutral, science-focused content accessible to all students"
+  ]
+}

@@ -1,0 +1,92 @@
+{
+  "title": "Reading Comprehension Questions",
+  "bundle_title": "RI.6.1 Text Evidence Bundle",
+  "tagline": "Cite Evidence | Support Inferences | Analyze Claims",
+  "objectives": "\u2022 Cite textual evidence to support analysis of what the text says explicitly\n\u2022 Make inferences from text and support them with relevant evidence",
+  "directions": "Read each question carefully. Choose the best answer for questions 1-5. Write your response for questions 6-10.",
+  "question_type_1_title": "Multiple Choice Questions",
+  "question_type_2_title": "Short & Extended Response",
+  "answer_key_title": "Answer Key",
+  "questions": [
+    {
+      "number": 1,
+      "question": "Which quote best supports the author's main claim?",
+      "options": {
+        "A": "Statistics show improvement",
+        "B": "Experts disagree on methods",
+        "C": "The problem continues",
+        "D": "Solutions remain unclear"
+      },
+      "answer": "A - Statistics show improvement"
+    },
+    {
+      "number": 2,
+      "question": "What evidence suggests the character feels nervous?",
+      "options": {
+        "A": "She smiled confidently",
+        "B": "Her hands were shaking",
+        "C": "She spoke loudly",
+        "D": "She arrived early"
+      },
+      "answer": "B - Her hands were shaking"
+    },
+    {
+      "number": 3,
+      "question": "Which detail from paragraph 3 supports the inference?",
+      "options": {
+        "A": "The temperature dropped",
+        "B": "Animals migrated south",
+        "C": "Plants stopped growing",
+        "D": "Rivers began freezing"
+      },
+      "answer": "B - Animals migrated south"
+    },
+    {
+      "number": 4,
+      "question": "The author's tone can be described as:",
+      "options": {
+        "A": "Optimistic and hopeful",
+        "B": "Critical and concerned",
+        "C": "Neutral and factual",
+        "D": "Humorous and light"
+      },
+      "answer": "B - Critical and concerned"
+    },
+    {
+      "number": 5,
+      "question": "What does the word 'resilient' mean in context?",
+      "options": {
+        "A": "Easily broken",
+        "B": "Able to recover quickly",
+        "C": "Very expensive",
+        "D": "Difficult to find"
+      },
+      "answer": "B - Able to recover quickly"
+    },
+    {
+      "number": 6,
+      "question": "Cite two pieces of evidence that support the author's argument about climate change.",
+      "answer": "The author cites rising global temperatures and melting polar ice caps as evidence. These facts demonstrate measurable environmental changes occurring worldwide."
+    },
+    {
+      "number": 7,
+      "question": "What inference can you make about the protagonist's motivation? Support with text evidence.",
+      "answer": "The protagonist is motivated by guilt over past mistakes. The text states she 'couldn't sleep' and 'avoided looking in mirrors,' showing her internal struggle."
+    },
+    {
+      "number": 8,
+      "question": "How does the author use statistics to strengthen their argument?",
+      "answer": "The author presents specific data about pollution levels and health impacts. These concrete numbers make the argument more credible and persuasive to readers."
+    },
+    {
+      "number": 9,
+      "question": "Analyze how the author develops their central idea throughout the text. Use specific evidence.",
+      "answer": "The author develops the central idea through a progression of evidence and examples. Beginning with personal anecdotes, they build to scientific data and expert opinions, creating a compelling case that moves from emotional appeal to logical proof."
+    },
+    {
+      "number": 10,
+      "question": "Make an inference about the text's intended audience. Support your reasoning with textual evidence.",
+      "answer": "The intended audience appears to be educated adults concerned about environmental issues. The formal vocabulary, complex sentence structures, and references to scientific studies suggest readers with advanced literacy and environmental awareness."
+    }
+  ]
+}

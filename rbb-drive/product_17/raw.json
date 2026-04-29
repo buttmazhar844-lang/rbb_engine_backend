@@ -1,0 +1,27 @@
+{
+  "title": "Writing Prompts",
+  "bundle_title": "RI.6.1 Evidence-Based Analysis Bundle",
+  "tagline": "Cite Evidence | Support Claims | Analyze Texts",
+  "objectives": "\u2022 Use textual evidence to support analysis of informational texts\n\u2022 Make accurate inferences based on explicit and implicit details",
+  "directions": "Choose one prompt and write a well-organized response using evidence from the text.",
+  "exemplar_title": "Writing Exemplar",
+  "exemplar_subtitle": "Sample Response",
+  "exemplar_content": "When analyzing the article \"The Impact of Social Media on Teen Mental Health,\" the author's main claim is that excessive social media use negatively affects teenagers' psychological well-being. This claim is strongly supported by multiple pieces of evidence throughout the text.\n\nFirst, the author cites a Stanford University study showing that \"teens who spend more than three hours daily on social media platforms are 60% more likely to experience symptoms of anxiety and depression.\" This statistical evidence directly supports the main argument by providing concrete data from a credible research institution.\n\nSecond, the text includes expert testimony from Dr. Sarah Chen, a child psychologist, who states that \"constant social comparison creates unrealistic expectations and damages self-esteem among adolescents.\" This expert opinion adds authority to the author's position while explaining the psychological mechanism behind the problem.\n\nAdditionally, the author presents anecdotal evidence through the case study of Maya, a 16-year-old who \"experienced significant improvement in mood and academic performance after reducing her social media usage from five hours to one hour daily.\" This real-world example makes the research findings more relatable and demonstrates practical solutions.\n\nThe author also addresses counterarguments by acknowledging that \"social media can provide valuable connections for isolated teens,\" but counters this by emphasizing that \"the risks outweigh the benefits when usage becomes excessive.\" This balanced approach strengthens the overall argument by showing the author considered multiple perspectives.\n\nTogether, these varied forms of evidence\u2014statistical data, expert testimony, case studies, and acknowledgment of opposing views\u2014create a compelling and well-supported argument about social media's impact on teen mental health.",
+  "prompts": [
+    {
+      "number": 1,
+      "title": "Supporting The Main Argument",
+      "content": "After reading an informational article, identify the author's main claim or argument. What specific evidence does the author provide to support this claim? In your response, cite at least three different pieces of evidence from the text and explain how each one strengthens the author's position. Use direct quotes and page references."
+    },
+    {
+      "number": 2,
+      "title": "Making Inferences From Evidence",
+      "content": "Choose a section of the text where the author doesn't directly state their opinion but implies it through the evidence presented. What can you infer about the author's viewpoint based on the details provided? Support your inference with specific examples from the text and explain your reasoning clearly."
+    },
+    {
+      "number": 3,
+      "title": "Evaluating Source Credibility",
+      "content": "Examine the sources and evidence the author uses in their informational text. Which pieces of evidence are most convincing and why? Which sources seem most reliable? In your analysis, consider the types of evidence used (statistics, expert opinions, studies) and explain how they contribute to the text's overall credibility."
+    }
+  ]
+}

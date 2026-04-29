@@ -1,0 +1,40 @@
+{
+  "title": "Exit Tickets",
+  "bundle_title": "RI.6.1 Text Evidence Bundle",
+  "tagline": "Cite Evidence | Support Claims | Analyze Text",
+  "objectives": "\u2022 Cite textual evidence to support analysis of what the text says explicitly\n\u2022 Make inferences based on evidence and draw logical conclusions from text",
+  "directions": "Answer the question below in complete sentences.",
+  "answer_key_title": "Answer Key",
+  "tickets": [
+    {
+      "number": 1,
+      "title": "Finding Explicit Evidence",
+      "question": "What is one piece of textual evidence that directly supports the author's main claim? Include the quote and page number.",
+      "sample_answer": "Students should identify a specific quote from the text that clearly states or supports the main argument. They must include proper citation with page numbers or paragraph references."
+    },
+    {
+      "number": 2,
+      "title": "Making Text Inferences",
+      "question": "What can you infer about the author's purpose based on the evidence presented? Support your inference with specific details.",
+      "sample_answer": "Students should make a logical inference about why the author wrote the text. They need to connect their inference to specific textual evidence or examples from the reading."
+    },
+    {
+      "number": 3,
+      "title": "Analyzing Supporting Details",
+      "question": "Which piece of evidence best supports the central idea? Explain why this evidence is most convincing.",
+      "sample_answer": "Students should identify the strongest piece of supporting evidence and explain its effectiveness. They should demonstrate understanding of how evidence relates to the main idea."
+    },
+    {
+      "number": 4,
+      "title": "Drawing Conclusions",
+      "question": "Based on the evidence in the text, what conclusion can you draw about the topic? Cite at least one supporting detail.",
+      "sample_answer": "Students should form a logical conclusion based on textual evidence. They must include at least one specific detail or quote that led them to this conclusion."
+    },
+    {
+      "number": 5,
+      "title": "Evidence Evaluation",
+      "question": "How does the author use evidence to convince readers? Give one example of effective evidence from the text.",
+      "sample_answer": "Students should analyze how the author presents evidence persuasively. They need to provide a specific example and explain why it effectively supports the author's argument."
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "verdict": "NEEDS_FIX",
+  "score": 68,
+  "issues": [
+    {
+      "category": "STRUCTURE",
+      "severity": "medium",
+      "description": "Questions lack accompanying text passages - reading comprehension questions require actual texts to analyze"
+    },
+    {
+      "category": "CLARITY",
+      "severity": "medium",
+      "description": "Multiple choice questions reference unspecified texts, making them impossible to answer without context"
+    },
+    {
+      "category": "ALIGNMENT",
+      "severity": "medium",
+      "description": "Cannot properly assess textual evidence citation skills without providing actual passages to cite from"
+    },
+    {
+      "category": "STRUCTURE",
+      "severity": "low",
+      "description": "Missing rubrics or scoring guidelines for extended response questions 6-10"
+    },
+    {
+      "category": "DIFFICULTY",
+      "severity": "low",
+      "description": "Question 5 may be confusing as it asks students to identify what requires inference rather than making an inference"
+    }
+  ],
+  "strengths": [
+    "Well-structured template with appropriate sections and clear organization",
+    "Good progression from multiple choice to extended response format",
+    "Questions target both explicit text evidence and inference skills as required by RI.6.1",
+    "Extended response questions provide comprehensive coverage of standard requirements",
+    "Answer key format is appropriate for grade level",
+    "Maintains neutral worldview throughout content"
+  ],
+  "recommendations": [
+    "Add 2-3 grade-appropriate reading passages of varying genres and lengths",
+    "Ensure all multiple choice questions reference specific, provided texts",
+    "Include scoring rubrics for questions 6-10 with clear performance criteria",
+    "Revise question 5 to be more straightforward about inference identification",
+    "Consider adding brief passage excerpts for context in multiple choice section"
+  ]
+}

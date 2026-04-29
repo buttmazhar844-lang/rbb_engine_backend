@@ -1,0 +1,50 @@
+{
+  "verdict": "NEEDS_FIX",
+  "score": 68,
+  "issues": [
+    {
+      "category": "STRUCTURE",
+      "severity": "CRITICAL",
+      "description": "Questions lack accompanying text passages - cannot assess textual evidence without source material"
+    },
+    {
+      "category": "ALIGNMENT",
+      "severity": "MAJOR",
+      "description": "Standard RI.6.1 requires citing evidence from specific texts, but no source texts are provided"
+    },
+    {
+      "category": "DIFFICULTY",
+      "severity": "MAJOR",
+      "description": "Questions 9-10 use complex analytical language inappropriate for Grade 6 (e.g., 'central idea development', 'intended audience analysis')"
+    },
+    {
+      "category": "CLARITY",
+      "severity": "MAJOR",
+      "description": "Multiple choice questions reference specific paragraphs, quotes, and characters without providing the source text"
+    },
+    {
+      "category": "STRUCTURE",
+      "severity": "MINOR",
+      "description": "Answer key format inconsistent between multiple choice (includes letter prefix) and constructed response (explanation only)"
+    },
+    {
+      "category": "DIFFICULTY",
+      "severity": "MINOR",
+      "description": "Vocabulary in some questions may be challenging for Grade 6 ('resilient', 'inference', 'protagonist's motivation')"
+    }
+  ],
+  "strengths": [
+    "Clear organizational structure with appropriate section headers",
+    "Good variety of question types targeting textual evidence skills",
+    "Questions 1-5 demonstrate appropriate multiple choice format",
+    "Objectives align well with RI.6.1 standard requirements",
+    "Content maintains neutral worldview as required"
+  ],
+  "recommendations": [
+    "Include 1-2 grade-appropriate text passages for students to reference",
+    "Simplify language in questions 9-10 for Grade 6 comprehension level",
+    "Ensure all questions reference specific line numbers or paragraphs from provided texts",
+    "Standardize answer key format across question types",
+    "Consider replacing advanced vocabulary with grade-level appropriate alternatives"
+  ]
+}

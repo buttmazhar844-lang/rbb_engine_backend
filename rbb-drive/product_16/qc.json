@@ -1,0 +1,36 @@
+{
+  "verdict": "NEEDS_FIX",
+  "score": 68,
+  "issues": [
+    {
+      "category": "STRUCTURE",
+      "severity": "major",
+      "description": "Questions reference non-existent text passages and specific paragraphs without providing the actual reading passage",
+      "suggestion": "Include the complete reading passage that students will analyze, or make questions generic enough to work with any text"
+    },
+    {
+      "category": "CLARITY",
+      "severity": "major",
+      "description": "Multiple choice questions are impossible to answer without the referenced text (e.g., 'paragraph two', 'paragraph three')",
+      "suggestion": "Either provide the text or rework questions to be text-independent examples"
+    },
+    {
+      "category": "DIFFICULTY",
+      "severity": "minor",
+      "description": "Questions 9-10 may be too advanced for grade 6, requiring analysis and evaluation skills typical of higher grades",
+      "suggestion": "Simplify questions 9-10 to focus more on identification and basic inference rather than complex analysis"
+    },
+    {
+      "category": "ALIGNMENT",
+      "severity": "minor",
+      "description": "While questions address citing evidence, they lack focus on explicit vs. implicit information distinction emphasized in RI.6.1",
+      "suggestion": "Add questions that specifically distinguish between what the text states directly versus what can be inferred"
+    },
+    {
+      "category": "STRUCTURE",
+      "severity": "minor",
+      "description": "Answer key explanations for short response questions are too generic and lack specific criteria or rubrics",
+      "suggestion": "Provide more detailed rubrics or sample responses for questions 6-10"
+    }
+  ]
+}

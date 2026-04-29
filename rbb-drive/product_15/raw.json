@@ -1,0 +1,92 @@
+{
+  "title": "Reading Comprehension Questions",
+  "bundle_title": "RI.6.1 Text Evidence Bundle",
+  "tagline": "Cite Evidence | Support Inferences | Analyze Text",
+  "objectives": "\u2022 Cite textual evidence to support analysis of what the text says explicitly\n\u2022 Make inferences from text and support them with relevant evidence",
+  "directions": "Read each question carefully. Choose the best answer for questions 1-5. Write your response for questions 6-10.",
+  "question_type_1_title": "Multiple Choice Questions",
+  "question_type_2_title": "Short & Extended Response",
+  "answer_key_title": "Answer Key",
+  "questions": [
+    {
+      "number": 1,
+      "question": "Which quote directly supports the claim about pollution effects?",
+      "options": {
+        "A": "The river was beautiful in spring",
+        "B": "Fish populations dropped 40% last year",
+        "C": "Many families enjoy the waterfront",
+        "D": "The bridge was built in 1950"
+      },
+      "answer": "B - Fish populations dropped 40% last year"
+    },
+    {
+      "number": 2,
+      "question": "What evidence shows the character's determination?",
+      "options": {
+        "A": "She smiled at her friends",
+        "B": "The weather was perfect",
+        "C": "She practiced piano for three hours daily",
+        "D": "Her teacher was encouraging"
+      },
+      "answer": "C - She practiced piano for three hours daily"
+    },
+    {
+      "number": 3,
+      "question": "Which detail proves the experiment was successful?",
+      "options": {
+        "A": "The students worked hard",
+        "B": "Plants grew 2 inches taller than expected",
+        "C": "The classroom was well-lit",
+        "D": "Everyone enjoyed the project"
+      },
+      "answer": "B - Plants grew 2 inches taller than expected"
+    },
+    {
+      "number": 4,
+      "question": "What inference can you make about the town's economy?",
+      "options": {
+        "A": "It depends on tourism",
+        "B": "It has many factories",
+        "C": "It's located near mountains",
+        "D": "It has good weather"
+      },
+      "answer": "A - It depends on tourism"
+    },
+    {
+      "number": 5,
+      "question": "Which statement requires an inference rather than explicit reading?",
+      "options": {
+        "A": "The store opens at 9 AM",
+        "B": "Sarah felt nervous about the test",
+        "C": "There are 50 states in America",
+        "D": "The book has 200 pages"
+      },
+      "answer": "B - Sarah felt nervous about the test"
+    },
+    {
+      "number": 6,
+      "question": "Cite evidence that shows the main character overcame a challenge. Explain your reasoning.",
+      "answer": "Evidence might include specific actions, dialogue, or outcomes that demonstrate growth. The reasoning should connect the evidence to the character's development and show how they succeeded despite obstacles."
+    },
+    {
+      "number": 7,
+      "question": "What can you infer about the setting based on the author's descriptions? Support with text evidence.",
+      "answer": "Students should identify specific descriptive details from the text and explain what these details suggest about time period, location, or atmosphere. The inference must be logical and well-supported."
+    },
+    {
+      "number": 8,
+      "question": "Find evidence of cause and effect in the text. Explain how you identified this relationship.",
+      "answer": "Students should cite specific text that shows one event leading to another. They should explain signal words or logical connections that helped them identify the cause-effect relationship in the passage."
+    },
+    {
+      "number": 9,
+      "question": "Analyze how the author uses evidence to support their main argument. Cite at least two examples from the text.",
+      "answer": "Students should identify the author's main claim and find specific evidence used to support it. They should explain how each piece of evidence strengthens the argument and evaluate the effectiveness of the author's reasoning and use of facts, examples, or expert opinions."
+    },
+    {
+      "number": 10,
+      "question": "Make an inference about the author's purpose and support it with textual evidence. Explain your reasoning process.",
+      "answer": "Students should determine whether the author aims to inform, persuade, or entertain based on text evidence. They should cite specific word choices, tone, structure, or content that supports their inference about purpose and explain their logical reasoning process."
+    }
+  ]
+}

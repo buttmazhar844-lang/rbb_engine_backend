@@ -1,0 +1,140 @@
+{
+  "title": "Vocabulary Pack",
+  "bundle_title": "RI.6.1 Text Evidence Bundle",
+  "tagline": "Analyze Evidence | Support Claims | Cite Sources",
+  "objectives": "\u2022 Master vocabulary for citing textual evidence and supporting inferences\n\u2022 Apply reading comprehension terms to analyze informational texts",
+  "directions": "Study the key vocabulary terms and examples, then complete the quiz.",
+  "quiz_header": "Vocabulary Quiz",
+  "quiz_direction": "Choose the best answer for each question.",
+  "answer_key_title": "Answer Key",
+  "vocabulary_words": [
+    {
+      "number": 1,
+      "word": "Textual Evidence",
+      "definition": "Specific details from a text that support an answer or claim.",
+      "sentence": "The student found textual evidence in paragraph three to support her inference about the character's motivation."
+    },
+    {
+      "number": 2,
+      "word": "Inference",
+      "definition": "A logical conclusion drawn from evidence and reasoning.",
+      "sentence": "Based on the data presented, readers can make an inference about climate change trends over the past decade."
+    },
+    {
+      "number": 3,
+      "word": "Explicit Information",
+      "definition": "Details that are directly stated in the text.",
+      "sentence": "The article provides explicit information about the invention date, clearly stating it was created in 1876."
+    },
+    {
+      "number": 4,
+      "word": "Implicit Information",
+      "definition": "Details suggested but not directly stated in the text.",
+      "sentence": "The author's bias was implicit information that readers had to infer from the word choices used."
+    },
+    {
+      "number": 5,
+      "word": "Citation",
+      "definition": "Reference to a specific part of a text as evidence.",
+      "sentence": "Students must include proper citation when quoting from the research article for their reports."
+    },
+    {
+      "number": 6,
+      "word": "Supporting Details",
+      "definition": "Facts or examples that back up a main idea or claim.",
+      "sentence": "The essay included strong supporting details like statistics and expert quotes to prove the thesis."
+    },
+    {
+      "number": 7,
+      "word": "Context Clues",
+      "definition": "Hints in surrounding text that help determine word meaning.",
+      "sentence": "Using context clues from the paragraph, Maria figured out the unfamiliar vocabulary word's definition."
+    },
+    {
+      "number": 8,
+      "word": "Main Idea",
+      "definition": "The central point or most important concept in a passage.",
+      "sentence": "After reading the article twice, James identified the main idea about renewable energy benefits."
+    },
+    {
+      "number": 9,
+      "word": "Analysis",
+      "definition": "Detailed examination of text elements and their relationships.",
+      "sentence": "Her analysis of the poem revealed how the author used metaphors to convey deeper meaning."
+    },
+    {
+      "number": 10,
+      "word": "Reasoning",
+      "definition": "The logical thinking process used to reach conclusions.",
+      "sentence": "Clear reasoning connects the evidence to the claim in effective argumentative writing."
+    }
+  ],
+  "quiz_questions": [
+    {
+      "number": 1,
+      "question": "What type of information is directly stated in a text?",
+      "options": {
+        "A": "Implicit information",
+        "B": "Inference",
+        "C": "Explicit information",
+        "D": "Context clues"
+      },
+      "answer": "C - Explicit Information"
+    },
+    {
+      "number": 2,
+      "question": "What do you call a logical conclusion based on evidence?",
+      "options": {
+        "A": "Inference",
+        "B": "Citation",
+        "C": "Main idea",
+        "D": "Analysis"
+      },
+      "answer": "A - Inference"
+    },
+    {
+      "number": 3,
+      "question": "What helps readers determine unknown word meanings?",
+      "options": {
+        "A": "Citations",
+        "B": "Context clues",
+        "C": "Main ideas",
+        "D": "Reasoning"
+      },
+      "answer": "B - Context Clues"
+    },
+    {
+      "number": 4,
+      "question": "What supports a main idea with facts or examples?",
+      "options": {
+        "A": "Analysis",
+        "B": "Inference",
+        "C": "Citation",
+        "D": "Supporting details"
+      },
+      "answer": "D - Supporting Details"
+    },
+    {
+      "number": 5,
+      "question": "What is the central point of a passage called?",
+      "options": {
+        "A": "Evidence",
+        "B": "Analysis",
+        "C": "Main idea",
+        "D": "Reasoning"
+      },
+      "answer": "C - Main Idea"
+    },
+    {
+      "number": 6,
+      "question": "What is detailed examination of text elements called?",
+      "options": {
+        "A": "Analysis",
+        "B": "Citation",
+        "C": "Inference",
+        "D": "Evidence"
+      },
+      "answer": "A - Analysis"
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "title": "Short Quiz",
+  "bundle_title": "RI.6.1 Text Evidence Bundle",
+  "tagline": "Cite Evidence | Support Claims | Analyze Sources",
+  "objectives": "\u2022 Cite textual evidence to support analysis of what the text says explicitly\n\u2022 Make inferences from the text using specific evidence and reasoning",
+  "directions": "Choose the best answer for questions 1-5. Write your response for questions 6-7.",
+  "answer_key_title": "Answer Key",
+  "questions": [
+    {
+      "number": 1,
+      "question": "What does citing textual evidence mean?",
+      "options": {
+        "A": "Writing your opinion about a text",
+        "B": "Using exact quotes or details from the text",
+        "C": "Summarizing the entire passage",
+        "D": "Adding your own ideas to the text"
+      },
+      "answer": "B - Using exact quotes or details from the text"
+    },
+    {
+      "number": 2,
+      "question": "Which is an example of explicit information?",
+      "options": {
+        "A": "Something you must figure out yourself",
+        "B": "A hidden meaning in the text",
+        "C": "Information directly stated in the text",
+        "D": "The author's unstated opinion"
+      },
+      "answer": "C - Information directly stated in the text"
+    },
+    {
+      "number": 3,
+      "question": "What is an inference?",
+      "options": {
+        "A": "A direct quote from the text",
+        "B": "A conclusion based on evidence and reasoning",
+        "C": "The main idea of a paragraph",
+        "D": "A summary of the text"
+      },
+      "answer": "B - A conclusion based on evidence and reasoning"
+    },
+    {
+      "number": 4,
+      "question": "Why should you cite evidence when analyzing a text?",
+      "options": {
+        "A": "To make your writing longer",
+        "B": "To show you read the passage",
+        "C": "To support your claims with proof",
+        "D": "To copy the author's style"
+      },
+      "answer": "C - To support your claims with proof"
+    },
+    {
+      "number": 5,
+      "question": "Which citation format is most effective?",
+      "options": {
+        "A": "According to the text...",
+        "B": "I think the author means...",
+        "C": "The passage is about...",
+        "D": "In my opinion..."
+      },
+      "answer": "A - According to the text..."
+    },
+    {
+      "number": 6,
+      "question": "Explain the difference between explicit and implicit information in a text.",
+      "answer": "Explicit information is directly stated in the text and can be found word-for-word. Implicit information requires the reader to make inferences by combining text evidence with their own reasoning to understand meanings that aren't directly stated."
+    },
+    {
+      "number": 7,
+      "question": "How do you support an inference with textual evidence?",
+      "answer": "To support an inference, identify specific details, quotes, or examples from the text that led to your conclusion. Then explain how this evidence connects to your inference and why it supports your reasoning about what the text suggests."
+    }
+  ]
+}

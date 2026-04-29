@@ -1,0 +1,92 @@
+{
+  "title": "Reading Comprehension Questions",
+  "bundle_title": "RI.6.1 Text Evidence Bundle",
+  "tagline": "Cite Evidence | Support Claims | Analyze Text",
+  "objectives": "\u2022 Cite textual evidence to support analysis of what the text says\n\u2022 Use evidence to make inferences and draw conclusions from text",
+  "directions": "Read each question carefully. Choose the best answer for questions 1-5. Write your response for questions 6-10.",
+  "question_type_1_title": "Multiple Choice Questions",
+  "question_type_2_title": "Short & Extended Response",
+  "answer_key_title": "Answer Key",
+  "questions": [
+    {
+      "number": 1,
+      "question": "Which sentence from the text best supports the main idea?",
+      "options": {
+        "A": "The first sentence of paragraph two",
+        "B": "The last sentence of paragraph one",
+        "C": "The middle sentence of paragraph three",
+        "D": "The conclusion sentence"
+      },
+      "answer": "B - The last sentence of paragraph one"
+    },
+    {
+      "number": 2,
+      "question": "What evidence shows the author's opinion about the topic?",
+      "options": {
+        "A": "Direct quotes from experts",
+        "B": "Statistical data presented",
+        "C": "Descriptive adjectives used",
+        "D": "Historical facts mentioned"
+      },
+      "answer": "C - Descriptive adjectives used"
+    },
+    {
+      "number": 3,
+      "question": "Which detail supports the inference that change occurred?",
+      "options": {
+        "A": "Before and after comparisons",
+        "B": "Expert opinions stated",
+        "C": "General background information",
+        "D": "Author's personal experience"
+      },
+      "answer": "A - Before and after comparisons"
+    },
+    {
+      "number": 4,
+      "question": "What textual evidence proves the claim made in paragraph two?",
+      "options": {
+        "A": "Examples in paragraph three",
+        "B": "Statistics in paragraph one",
+        "C": "Quotes in paragraph four",
+        "D": "Summary in conclusion"
+      },
+      "answer": "A - Examples in paragraph three"
+    },
+    {
+      "number": 5,
+      "question": "Which phrase best supports the author's conclusion?",
+      "options": {
+        "A": "Research data from studies",
+        "B": "Personal opinions shared",
+        "C": "Background context provided",
+        "D": "Introductory statements made"
+      },
+      "answer": "A - Research data from studies"
+    },
+    {
+      "number": 6,
+      "question": "Identify two pieces of evidence that support the author's main argument.",
+      "answer": "Students should identify specific quotes or facts from the text that directly support the central claim made by the author."
+    },
+    {
+      "number": 7,
+      "question": "What inference can you make based on the evidence in paragraph three?",
+      "answer": "Students should state a logical conclusion drawn from textual details and explain how the evidence leads to that inference."
+    },
+    {
+      "number": 8,
+      "question": "How does the evidence in the text support or contradict your prior knowledge?",
+      "answer": "Students should compare textual evidence to what they already knew and explain whether the text confirms or challenges their understanding."
+    },
+    {
+      "number": 9,
+      "question": "Analyze how the author uses evidence throughout the text to build their argument.",
+      "answer": "Students should examine the progression of evidence, explaining how different types of support work together to strengthen the author's position."
+    },
+    {
+      "number": 10,
+      "question": "Evaluate the strength of the evidence presented and explain whether it convincingly supports the main claim.",
+      "answer": "Students should assess the quality and relevance of textual evidence, determining if it adequately proves the author's main argument."
+    }
+  ]
+}

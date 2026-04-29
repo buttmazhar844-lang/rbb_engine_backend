@@ -1,0 +1,27 @@
+{
+  "title": "Writing Prompts",
+  "bundle_title": "RI.6.1 Text Evidence and Inference Bundle",
+  "tagline": "Cite Evidence | Make Inferences | Support Claims",
+  "objectives": "\u2022 Cite textual evidence to support analysis of what the text says explicitly\n\u2022 Make inferences based on evidence and explain reasoning clearly",
+  "directions": "Choose one prompt and write a well-organized response using evidence from the text. Include direct quotes and page numbers to support your analysis.",
+  "exemplar_title": "Writing Exemplar",
+  "exemplar_subtitle": "Sample Response",
+  "exemplar_content": "Prompt: What can you infer about the author's perspective on renewable energy based on the evidence presented?\n\nBased on the evidence in the article, I can infer that the author strongly supports renewable energy development. The text explicitly states that \"solar and wind power have become 40% cheaper in the last decade\" (page 2). This factual information shows the author chose to highlight the economic benefits of renewable energy.\n\nThe author's word choice also reveals a positive perspective. The text describes renewable energy as \"revolutionary\" and \"essential for our future,\" while fossil fuels are called \"outdated\" and \"harmful\" (page 3). These loaded words suggest the author believes renewable energy is superior.\n\nAdditionally, the author includes statistics showing that \"renewable energy now provides 30% of global electricity\" but fails to mention any challenges or drawbacks (page 4). This selective presentation of only positive information suggests the author wants readers to view renewable energy favorably.\n\nThe evidence clearly shows the author advocates for renewable energy through careful selection of supporting facts, positive language, and one-sided presentation of information.",
+  "prompts": [
+    {
+      "number": 1,
+      "title": "Detective Work: Finding Hidden Meanings",
+      "content": "You're reading an informational article about climate change. The author doesn't directly state their opinion, but their word choices and evidence selection reveal their perspective. What can you infer about the author's viewpoint? Use specific quotes and examples to support your inference about what the author really believes."
+    },
+    {
+      "number": 2,
+      "title": "Evidence Hunt: Supporting Your Analysis",
+      "content": "After reading the article about social media's impact on teens, your friend claims the author thinks social media is completely harmful. Do you agree or disagree? Write a response that cites at least three pieces of textual evidence. Explain how each quote supports or challenges your friend's interpretation of the author's message."
+    },
+    {
+      "number": 3,
+      "title": "Reading Between The Lines: Author's Purpose",
+      "content": "The article about space exploration presents many facts about Mars missions, but what is the author's deeper purpose? Analyze the evidence to infer whether the author wants to inform, persuade, or entertain readers. Support your analysis with specific examples of how the author presents information and uses language throughout the text."
+    }
+  ]
+}

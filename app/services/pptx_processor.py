@@ -110,7 +110,9 @@ class PPTXProcessor:
         return True
 
     def _fill_slides(self, prs: Presentation, token_map: Dict[str, tuple]):
-        """Fill all slides using token→(value, font_pt) or token→(value, font_pt, bold) map."""
+        """Fill all slides using token map.
+        Entry: (value, font_pt) or (value, font_pt, bold) or (value, font_pt, bold, label)
+        """
         for slide in prs.slides:
             for shape in slide.shapes:
                 if not hasattr(shape, 'text_frame'):
@@ -121,8 +123,12 @@ class PPTXProcessor:
                 for token, entry in token_map.items():
                     if token in raw:
                         value, fpt = entry[0], entry[1]
-                        bold = entry[2] if len(entry) > 2 else None
-                        self._fill_shape(shape, token, value, fpt, bold)
+                        bold  = entry[2] if len(entry) > 2 else None
+                        label = entry[3] if len(entry) > 3 else None
+                        if label is not None:
+                            self._fill_label_box(shape, token, label, value, fpt)
+                        else:
+                            self._fill_shape(shape, token, value, fpt, bold)
                         break
 
     def _save(self, prs: Presentation, product_id: int, filename: str) -> Path:
@@ -162,6 +168,23 @@ class PPTXProcessor:
         if t.lower().startswith(p):
             t = t[len(p):].lstrip(': ').strip()
         return t
+
+    def _fmt_numbered_question(self, q: dict, num: int, answer_lines: str = '') -> str:
+        """Format a numbered question with options if MCQ, plus optional answer lines."""
+        text = q.get('question', '')
+        options = q.get('options', {})
+        if options:
+            opts = "\n".join(f"{k}. {v}" for k, v in options.items())
+            return f"{num}. {text}\n{opts}"
+        base = f"{num}. {text}"
+        if answer_lines:
+            return f"{base}\n{answer_lines}"
+        return base
+
+    def _fmt_numbered_answer(self, q: dict, num: int) -> str:
+        """Format a numbered answer."""
+        ans = q.get('answer', '')
+        return f"{num}. {ans}" if ans else ''
 
     def _fmt_question(self, q: dict) -> str:
         """Format a question dict into a display string with A-D options if present."""
@@ -396,18 +419,18 @@ class PPTXProcessor:
             # GRADE_INFO / STANDARD_INFO: 14pt
             "{{EXIT_TICKETS_GRADE_INFO}}":    (header_line, 14, False),
             "{{EXIT_TICKETS_STANDARD_INFO}}": (tagline,     14, False),
-            # Objectives/Directions: 12pt (template has static prefix)
-            "{{EXIT_TICKETS_OBJECTIVES}}":   (self._strip_prefix(content_data.get('objectives', ''), 'Objectives'),  12, False),
-            "{{EXIT_TICKETS_DIRECTIONS}}":   (self._strip_prefix(content_data.get('directions', ''), 'Directions'),  12, False),
+            # Objectives/Directions: bold label prefix
+            "{{EXIT_TICKETS_OBJECTIVES}}":   (self._strip_prefix(content_data.get('objectives', ''), 'Objectives'),  12, False, 'Objectives:'),
+            "{{EXIT_TICKETS_DIRECTIONS}}":   (self._strip_prefix(content_data.get('directions', ''), 'Directions'),  12, False, 'Directions:'),
             # Answer key title: 16pt bold (template)
             "{{EXIT_TICKETS_ANSWER_KEY_TITLE}}": (content_data.get('answer_key_title', 'Answer Key'), 16, True),
         }
         for i, ticket in enumerate(tickets[:5], start=1):
-            token_map[f"{{{{EXIT_TICKET_TITLE_{i}}}}}"]            = (ticket.get('title', ''),         12, True)
-            token_map[f"{{{{EXIT_TICKET_QUESTION_CONTENT_{i}}}}}"] = (ticket.get('question', ''),      12, False)
-            token_map[f"{{{{EXIT_TICKET_LINES_FOR_ANSWER_{i}}}}}"] = (answer_lines,                    12, False)
-            token_map[f"{{{{EXIT_TICKETS_SAMPLE_ANSWER_TITLE_{i}}}}}"]   = (ticket.get('title', ''),         12, True)
-            token_map[f"{{{{EXIT_TICKETS_SAMPLE_ANSWER_CONTENT_{i}}}}}"] = (ticket.get('sample_answer', ''), 12, False)
+            token_map[f"{{{{EXIT_TICKET_TITLE_{i}}}}}"]            = (f"{i}. {ticket.get('title', '')}",           12, True)
+            token_map[f"{{{{EXIT_TICKET_QUESTION_CONTENT_{i}}}}}"] = (ticket.get('question', ''),                  12, False)
+            token_map[f"{{{{EXIT_TICKET_LINES_FOR_ANSWER_{i}}}}}"] = (answer_lines,                                12, False)
+            token_map[f"{{{{EXIT_TICKETS_SAMPLE_ANSWER_TITLE_{i}}}}}"]   = (f"{i}. {ticket.get('title', '')}",    12, True)
+            token_map[f"{{{{EXIT_TICKETS_SAMPLE_ANSWER_CONTENT_{i}}}}}"] = (f"{i}. {ticket.get('sample_answer', '')}", 12, False)
 
         self._fill_slides(prs, token_map)
         return self._save(prs, product_id, "exit_tickets.pptx")
@@ -435,22 +458,38 @@ class PPTXProcessor:
             # GRADE_INFO / STANDARD_INFO: 14pt
             "{{READING_COMPREHENSION_QUESTIONS_GRADE_INFO}}":               (header_line, 14, False),
             "{{READING_COMPREHENSION_QUESTIONS_STANDARD_INFO}}":            (tagline,     14, False),
-            # Objectives/Directions: 12pt
-            "{{READING_COMPREHENSION_QUESTIONS_OBJECTIVES}}":               (self._strip_prefix(content_data.get('objectives', ''), 'Objectives'),  12, False),
-            "{{READING_COMPREHENSION_QUESTIONS_DIRECTIONS}}":               (self._strip_prefix(content_data.get('directions', ''), 'Directions'),  12, False),
+            # Objectives/Directions: bold label prefix
+            "{{READING_COMPREHENSION_QUESTIONS_OBJECTIVES}}":               (self._strip_prefix(content_data.get('objectives', ''), 'Objectives'),  12, False, 'Objectives:'),
+            "{{READING_COMPREHENSION_QUESTIONS_DIRECTIONS}}":               (self._strip_prefix(content_data.get('directions', ''), 'Directions'),  12, False, 'Directions:'),
             # Section titles: 12pt bold
-            "{{READING_COMPREHENSION_QUESTIONS_TYPE_OF_QUESTION_TITLE_1}}": (content_data.get('question_type_1_title', 'Multiple Choice Questions'), 12, True),
-            "{{READING_COMPREHENSION_QUESTIONS_TYPE_OF_QUESTION_TITLE_2}}": (content_data.get('question_type_2_title', 'Short & Extended Response'),  12, True),
+            "{{READING_COMPREHENSION_QUESTIONS_TYPE_OF_QUESTION_TITLE_1}}": ('MULTIPLE CHOICE', 12, True),
+            "{{READING_COMPREHENSION_QUESTIONS_TYPE_OF_QUESTION_TITLE_2}}": ('SHORT ANSWER', 12, True),
             # Answer key title: 14pt bold
             "{{READING_COMPREHENSION_QUESTIONS_ANSWER_KEY_TITLE}}":         (content_data.get('answer_key_title', 'Answer Key'), 14, True),
         }
-        # Q1-5: MCQ in 1.11in boxes — 10pt fits question+4 options
-        # Q6-10: short/extended in 1.51-1.72in boxes — 11pt
-        # Answer key slide 3: 0.3-0.9in boxes — compact answer
+        short_lines    = "_" * 65 + "\n" + "_" * 65
+        extended_lines = "_" * 65 + "\n" + "_" * 65 + "\n" + "_" * 65
         for i, q in enumerate(questions[:10], start=1):
-            fpt_q = 10 if i <= 5 else 11
-            token_map[f"{{{{READING_COMPREHENSION_QUESTION_CONTENT_{i}}}}}"]        = (self._fmt_question(q),     fpt_q, False)
-            token_map[f"{{{{READING_COMPREHENSION_QUESTION_ANSWER_CONTENT_{i}}}}}"] = (self._fmt_answer_short(q), 11,    False)
+            if i <= 5:
+                # MCQ: numbered, 10pt
+                token_map[f"{{{{READING_COMPREHENSION_QUESTION_CONTENT_{i}}}}}"] = (
+                    self._fmt_numbered_question(q, i), 10, False)
+            elif i <= 8:
+                # Short response: numbered + answer lines, 11pt
+                token_map[f"{{{{READING_COMPREHENSION_QUESTION_CONTENT_{i}}}}}"] = (
+                    self._fmt_numbered_question(q, i, short_lines), 11, False)
+            else:
+                # Extended response: prepend heading before Q9, numbered + answer lines, 11pt
+                q_text = self._fmt_numbered_question(q, i, extended_lines)
+                if i == 9:
+                    q_text = f"EXTENDED RESPONSE:\n{q_text}"
+                token_map[f"{{{{READING_COMPREHENSION_QUESTION_CONTENT_{i}}}}}"] = (
+                    q_text, 11, False)
+            ans_text = self._fmt_numbered_answer(q, i)
+            if i == 9:
+                ans_text = f"EXTENDED RESPONSE:\n{ans_text}"
+            token_map[f"{{{{READING_COMPREHENSION_QUESTION_ANSWER_CONTENT_{i}}}}}"] = (
+                ans_text, 11, False)
 
         self._fill_slides(prs, token_map)
         return self._save(prs, product_id, "reading_comprehension_questions.pptx")
@@ -478,16 +517,24 @@ class PPTXProcessor:
             # GRADE_INFO / STANDARD_INFO: 14pt
             "{{SHORT_QUIZ_GRADE_INFO}}":       (header_line, 14, False),
             "{{SHORT_QUIZ_STANDARD_INFO}}":    (tagline,     14, False),
-            # Objectives/Directions: 12pt
-            "{{SHORT_QUIZ_OBJECTIVES}}":       (self._strip_prefix(content_data.get('objectives', ''), 'Objectives'), 12, False),
-            "{{SHORT_QUIZ_DIRECTIONS}}":       (self._strip_prefix(content_data.get('directions', ''), 'Directions'),  12, False),
+            # Objectives/Directions: bold label prefix
+            "{{SHORT_QUIZ_OBJECTIVES}}":       (self._strip_prefix(content_data.get('objectives', ''), 'Objectives'), 12, False, 'Objectives:'),
+            "{{SHORT_QUIZ_DIRECTIONS}}":       (self._strip_prefix(content_data.get('directions', ''), 'Directions'),  12, False, 'Directions:'),
             # Answer key title: 16pt bold
             "{{SHORT_QUIZ_ANSWER_KEY_TITLE}}": (content_data.get('answer_key_title', 'Answer Key'), 16, True),
         }
+        short_lines = "_" * 65 + "\n" + "_" * 65
         for i, q in enumerate(questions[:7], start=1):
-            # Q1-5 MCQ: 11pt fits in 1.51in box; Q6-7 short: 11pt
-            token_map[f"{{{{SHORT_QUIZ_QUESTION_CONTENT_{i}}}}}"] = (self._fmt_question(q), 11, False)
-            token_map[f"{{{{SHORT_QUIZ_ANSWER_CONTENT_{i}}}}}"]   = (self._fmt_answer(q),   11, False)
+            if i <= 5:
+                # MCQ: numbered, consistent 11pt, bold=False
+                token_map[f"{{{{SHORT_QUIZ_QUESTION_CONTENT_{i}}}}}"] = (
+                    self._fmt_numbered_question(q, i), 11, False)
+            else:
+                # Short response: numbered + answer lines, 11pt
+                token_map[f"{{{{SHORT_QUIZ_QUESTION_CONTENT_{i}}}}}"] = (
+                    self._fmt_numbered_question(q, i, short_lines), 11, False)
+            token_map[f"{{{{SHORT_QUIZ_ANSWER_CONTENT_{i}}}}}"] = (
+                self._fmt_numbered_answer(q, i), 11, False)
 
         self._fill_slides(prs, token_map)
         return self._save(prs, product_id, "short_quiz.pptx")
@@ -521,8 +568,8 @@ class PPTXProcessor:
             "{{VOCABULARY_PACK_GRADE_INFO}}":     (header_line, 14, False),
             "{{VOCABULARY_PACK_STANDARD_INFO}}":  (tagline,     14, False),
             # Objectives/Directions: 12pt
-            "{{VOCABULARY_PACK_OBJECTIVES}}":     (self._strip_prefix(content_data.get('objectives', ''), 'Objectives'), 12, False),
-            "{{VOCABULARY_PACK_DIRECTIONS}}":     (self._strip_prefix(content_data.get('directions', ''), 'Directions'),  12, False),
+            "{{VOCABULARY_PACK_OBJECTIVES}}":     (self._strip_prefix(content_data.get('objectives', ''), 'Objectives'), 12, False, 'Objectives:'),
+            "{{VOCABULARY_PACK_DIRECTIONS}}":     (self._strip_prefix(content_data.get('directions', ''), 'Directions'),  12, False, 'Directions:'),
             # Section title: 12pt bold
             "{{VOCABULARY_PACK_TITLE}}":          (vp_title,                                           12, True),
             # Quiz header: 12pt bold; direction: 12pt
@@ -540,9 +587,12 @@ class PPTXProcessor:
             token_map[f"{{{{VOCABULARY_PACK_SENTENCE_CONTENT_{i}}}}}"]   = (w.get('sentence', ''),   12, False)
         for i, q in enumerate(quiz_qs[:6], start=1):
             # Quiz question boxes: 1.31in = ~6 lines at 10pt (MCQ needs 5 lines)
-            token_map[f"{{{{VOCABULARY_QUIZ_QUESTION_CONTENT_{i}}}}}"] = (self._fmt_question(q),     10, False)
+            q_text = self._fmt_question(q)
+            numbered_q = f"{i}. {q_text}" if q_text else ''
+            token_map[f"{{{{VOCABULARY_QUIZ_QUESTION_CONTENT_{i}}}}}"] = (numbered_q,                10, False)
             # Answer boxes: 0.28in = 1 line
-            token_map[f"{{{{VOCABULARY_QUIZ_ANSWER_CONTENT_{i}}}}}"]   = (self._fmt_answer_short(q), 11, False)
+            ans = self._fmt_answer_short(q)
+            token_map[f"{{{{VOCABULARY_QUIZ_ANSWER_CONTENT_{i}}}}}"]   = (f"{i}. {ans}" if ans else '', 11, False)
 
         self._fill_slides(prs, token_map)
         return self._save(prs, product_id, "vocabulary_pack.pptx")
@@ -570,9 +620,9 @@ class PPTXProcessor:
             # GRADE_INFO / STANDARD_INFO: 14pt
             "{{WRITING_PROMPT_PACK_GRADE_INFO}}":  (header_line, 14, False),
             "{{WRITING_PROMPT_PACK_STANDARD_INFO}}": (tagline,   14, False),
-            # Objectives/Directions: 12pt
-            "{{WRITING_PROMPT_PACK_OBJECTIVES}}":  (self._strip_prefix(content_data.get('objectives', ''), 'Objectives'), 12, False),
-            "{{WRITING_PROMPT_PACK_DIRECTIONS}}":  (self._strip_prefix(content_data.get('directions', ''), 'Directions'),  12, False),
+            # Objectives/Directions: bold label prefix
+            "{{WRITING_PROMPT_PACK_OBJECTIVES}}":  (self._strip_prefix(content_data.get('objectives', ''), 'Objectives'), 12, False, 'Objectives:'),
+            "{{WRITING_PROMPT_PACK_DIRECTIONS}}":  (self._strip_prefix(content_data.get('directions', ''), 'Directions'),  12, False, 'Directions:'),
             # Pack title: 12pt bold
             "{{WRITING_PROMPT_PACK_TITLE}}":       (wp_title,                                               12, True),
             # Exemplar title: 16pt bold; subtitle: 12pt bold
@@ -581,9 +631,9 @@ class PPTXProcessor:
             "{{WRITING_EXEMPLAR_CONTENT}}":        (content_data.get('exemplar_content', ''),               12, False),
         }
         for i, p in enumerate(prompts[:3], start=1):
-            # Prompt titles: 12pt bold; content: 12pt
-            token_map[f"{{{{WRITING_PROMPT_TITLE_{i}}}}}"]   = (p.get('title', ''),   12, True)
-            token_map[f"{{{{WRITING_PROMPT_CONTENT_{i}}}}}"] = (p.get('content', ''), 12, False)
+            # Prompt titles: numbered, 12pt bold; content: 12pt
+            token_map[f"{{{{WRITING_PROMPT_TITLE_{i}}}}}"]   = (f"{i}. {p.get('title', '')}", 12, True)
+            token_map[f"{{{{WRITING_PROMPT_CONTENT_{i}}}}}"] = (p.get('content', ''),          12, False)
 
         self._fill_slides(prs, token_map)
         return self._save(prs, product_id, "writing_prompts.pptx")

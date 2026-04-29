@@ -1,0 +1,32 @@
+{
+  "verdict": "PASS",
+  "score": 88,
+  "issues": [
+    {
+      "category": "STRUCTURE",
+      "severity": "minor",
+      "description": "Discussion questions could benefit from clearer labeling as 'explicit evidence' vs 'inference' questions to better align with the standard's dual focus"
+    },
+    {
+      "category": "DIFFICULTY",
+      "severity": "minor",
+      "description": "Some vocabulary terms (herbicides, pollinator corridors) may be challenging for grade 6 students without additional context clues"
+    },
+    {
+      "category": "CLARITY",
+      "severity": "minor",
+      "description": "Question 6 uses sophisticated language ('surrounding context') that could be simplified for grade 6 comprehension"
+    }
+  ],
+  "strengths": [
+    "Excellent alignment with RI.6.1 standard requiring both explicit evidence citation and inference support",
+    "Age-appropriate scientific content that engages 6th grade interest in environmental topics",
+    "Well-structured passage with clear progression from problem identification to solutions",
+    "Comprehensive vocabulary support with definitions provided",
+    "Discussion questions effectively scaffold from basic evidence location to complex inference-making",
+    "Neutral worldview maintained while presenting factual scientific information",
+    "Appropriate text complexity for grade 6 reading level",
+    "Real expert quotes add authenticity and provide clear citation opportunities"
+  ],
+  "overall_feedback": "This is a high-quality anchor reading passage that effectively supports RI.6.1 instruction. The content is scientifically accurate, age-appropriate, and provides excellent opportunities for students to practice both explicit evidence citation and inference skills. The monarch butterfly topic is engaging and relevant to 6th graders while maintaining educational rigor. Minor improvements in question clarity and vocabulary scaffolding would enhance accessibility."
+}
