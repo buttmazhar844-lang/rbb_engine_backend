@@ -469,21 +469,26 @@ class PPTXProcessor:
         }
         short_lines    = "_" * 65 + "\n" + "_" * 65
         extended_lines = "_" * 65 + "\n" + "_" * 65 + "\n" + "_" * 65
+
+        # Build question content for slides 1-2 (question text)
+        question_content_map = {}
+        # Build answer content for slide 3 MCQ boxes (answer text)
+        answer_key_mcq_map = {}
+
         for i, q in enumerate(questions[:10], start=1):
             if i <= 5:
-                # MCQ: numbered, 10pt
-                token_map[f"{{{{READING_COMPREHENSION_QUESTION_CONTENT_{i}}}}}"] = (
+                question_content_map[f"{{{{READING_COMPREHENSION_QUESTION_CONTENT_{i}}}}}"] = (
                     self._fmt_numbered_question(q, i), 10, False)
+                answer_key_mcq_map[f"{{{{READING_COMPREHENSION_QUESTION_CONTENT_{i}}}}}"] = (
+                    self._fmt_numbered_answer(q, i), 11, False)
             elif i <= 8:
-                # Short response: numbered + answer lines, 11pt
-                token_map[f"{{{{READING_COMPREHENSION_QUESTION_CONTENT_{i}}}}}"] = (
+                question_content_map[f"{{{{READING_COMPREHENSION_QUESTION_CONTENT_{i}}}}}"] = (
                     self._fmt_numbered_question(q, i, short_lines), 11, False)
             else:
-                # Extended response: prepend heading before Q9, numbered + answer lines, 11pt
                 q_text = self._fmt_numbered_question(q, i, extended_lines)
                 if i == 9:
                     q_text = f"EXTENDED RESPONSE:\n{q_text}"
-                token_map[f"{{{{READING_COMPREHENSION_QUESTION_CONTENT_{i}}}}}"] = (
+                question_content_map[f"{{{{READING_COMPREHENSION_QUESTION_CONTENT_{i}}}}}"] = (
                     q_text, 11, False)
             ans_text = self._fmt_numbered_answer(q, i)
             if i == 9:
@@ -491,7 +496,47 @@ class PPTXProcessor:
             token_map[f"{{{{READING_COMPREHENSION_QUESTION_ANSWER_CONTENT_{i}}}}}"] = (
                 ans_text, 11, False)
 
-        self._fill_slides(prs, token_map)
+        # Fill slides 1-2: question boxes get question text
+        for si, slide in enumerate(prs.slides):
+            if si >= 2:
+                break
+            for shape in slide.shapes:
+                if not hasattr(shape, 'text_frame'):
+                    continue
+                raw = shape.text_frame.text
+                if any(skip in raw for skip in SKIP_TOKENS):
+                    continue
+                for token, entry in {**token_map, **question_content_map}.items():
+                    if token in raw:
+                        value, fpt = entry[0], entry[1]
+                        bold  = entry[2] if len(entry) > 2 else None
+                        label = entry[3] if len(entry) > 3 else None
+                        if label is not None:
+                            self._fill_label_box(shape, token, label, value, fpt)
+                        else:
+                            self._fill_shape(shape, token, value, fpt, bold)
+                        break
+
+        # Fill slide 3: MCQ boxes (CONTENT_1-5) get answer text; answer content boxes get answers
+        if len(prs.slides) > 2:
+            slide3_map = {**token_map, **answer_key_mcq_map}
+            for shape in prs.slides[2].shapes:
+                if not hasattr(shape, 'text_frame'):
+                    continue
+                raw = shape.text_frame.text
+                if any(skip in raw for skip in SKIP_TOKENS):
+                    continue
+                for token, entry in slide3_map.items():
+                    if token in raw:
+                        value, fpt = entry[0], entry[1]
+                        bold  = entry[2] if len(entry) > 2 else None
+                        label = entry[3] if len(entry) > 3 else None
+                        if label is not None:
+                            self._fill_label_box(shape, token, label, value, fpt)
+                        else:
+                            self._fill_shape(shape, token, value, fpt, bold)
+                        break
+
         return self._save(prs, product_id, "reading_comprehension_questions.pptx")
 
     # ------------------------------------------------------------------ #
