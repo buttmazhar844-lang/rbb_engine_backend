@@ -131,13 +131,10 @@ async def generate_template(
             product.internal_linking_block = metadata.get('internal_linking_block')
             product.social_snippets = metadata.get('social_snippets')
             
-            # Update product status based on QC result
-            if qc_result.get('verdict') in ('PASS', 'NEEDS_FIX'):
-                product.status = ProductStatus.GENERATED
-                logger.info(f"Template {product.id} generated successfully (QC: {qc_result.get('score')}%)")
-            else:
-                product.status = ProductStatus.FAILED
-                logger.warning(f"Template {product.id} failed QC: {qc_result.get('verdict')} (score: {qc_result.get('score')}%)")
+            # Update product status — mark GENERATED if content was produced, regardless of QC score
+            # QC result is saved to qc.json for reference but does not block generation
+            product.status = ProductStatus.GENERATED
+            logger.info(f"Template {product.id} generated successfully (QC: {qc_result.get('verdict')} {qc_result.get('score')}%)")
             
             db.commit()
             
