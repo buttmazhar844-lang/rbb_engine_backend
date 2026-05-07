@@ -1,0 +1,32 @@
+{
+  "verdict": "PASS",
+  "score": 88,
+  "issues": [
+    {
+      "type": "CLARITY",
+      "severity": "minor",
+      "description": "Some vocabulary terms like 'suprachiasmatic nucleus' and 'glymphatic system' may be challenging for 6th graders without additional context or pronunciation guides"
+    },
+    {
+      "type": "DIFFICULTY",
+      "severity": "minor",
+      "description": "The passage contains dense scientific content that approaches the upper limit of grade 6 complexity, though still appropriate"
+    },
+    {
+      "type": "STRUCTURE",
+      "severity": "minor",
+      "description": "Discussion questions could benefit from more explicit scaffolding to guide students between citing evidence and making inferences"
+    }
+  ],
+  "strengths": [
+    "Excellent alignment with RI.6.1 standard requiring students to cite evidence and make inferences",
+    "Well-structured template with clear objectives, vocabulary support, and comprehensive content",
+    "Age-appropriate topic that directly relates to students' lives and experiences",
+    "Strong balance of explicit information and opportunities for inference-making",
+    "Scientifically accurate content presented at appropriate complexity level",
+    "Discussion questions effectively target both explicit evidence citation and inference skills",
+    "Neutral worldview maintained throughout with factual, research-based content",
+    "Good progression from vocabulary introduction to passage reading to skill application"
+  ],
+  "overall_assessment": "This is a high-quality educational resource that effectively supports 6th grade reading comprehension skills. The content is engaging, scientifically sound, and well-aligned with curriculum standards. Minor vocabulary complexity concerns are offset by the relevance and importance of the topic for student audiences."
+}

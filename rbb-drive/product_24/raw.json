@@ -1,0 +1,92 @@
+{
+  "title": "Reading Comprehension Questions",
+  "bundle_title": "RI.6.1 Evidence & Inference Bundle",
+  "tagline": "Cite Evidence | Make Inferences | Support Claims",
+  "objectives": "\u2022 Cite textual evidence to support analysis of what the text says explicitly\n\u2022 Draw inferences from text using evidence to support conclusions",
+  "directions": "Read each question carefully. Choose the best answer for questions 1-5. Write your response for questions 6-10.",
+  "question_type_1_title": "Multiple Choice Questions",
+  "question_type_2_title": "Short & Extended Response",
+  "answer_key_title": "Answer Key",
+  "questions": [
+    {
+      "number": 1,
+      "question": "Which sentence best supports the claim that recycling helps the environment?",
+      "options": {
+        "A": "Recycling is easy to do",
+        "B": "Recycling reduces landfill waste",
+        "C": "Many people recycle daily",
+        "D": "Recycling bins are blue"
+      },
+      "answer": "B - Recycling reduces landfill waste"
+    },
+    {
+      "number": 2,
+      "question": "What can you infer about the character based on this evidence: 'Sarah packed extra snacks'?",
+      "options": {
+        "A": "She is always hungry",
+        "B": "She likes to share food",
+        "C": "She plans ahead carefully",
+        "D": "She dislikes cafeteria food"
+      },
+      "answer": "C - She plans ahead carefully"
+    },
+    {
+      "number": 3,
+      "question": "Which detail explicitly states the main problem in the article?",
+      "options": {
+        "A": "The town needs more parks",
+        "B": "Traffic increased by 30%",
+        "C": "People seem unhappy lately",
+        "D": "The mayor made a speech"
+      },
+      "answer": "B - Traffic increased by 30%"
+    },
+    {
+      "number": 4,
+      "question": "What evidence supports the inference that the experiment was successful?",
+      "options": {
+        "A": "The scientist was excited",
+        "B": "Results matched predictions",
+        "C": "Many people watched",
+        "D": "The lab was well-equipped"
+      },
+      "answer": "B - Results matched predictions"
+    },
+    {
+      "number": 5,
+      "question": "Which quote directly supports the author's main argument?",
+      "options": {
+        "A": "Many experts agree on this topic",
+        "B": "Research shows clear benefits",
+        "C": "This issue affects everyone",
+        "D": "People have different opinions"
+      },
+      "answer": "B - Research shows clear benefits"
+    },
+    {
+      "number": 6,
+      "question": "Find two pieces of evidence that support the claim that exercise improves academic performance.",
+      "answer": "Students who exercise score 15% higher on tests. Physical activity increases brain function and memory retention according to the research."
+    },
+    {
+      "number": 7,
+      "question": "What can you infer about the setting based on the textual clues provided? Use evidence to support your answer.",
+      "answer": "The setting is a small rural town. Evidence includes 'dirt roads,' 'one traffic light,' and 'everyone knows each other.'"
+    },
+    {
+      "number": 8,
+      "question": "Cite evidence that shows the character's motivation changed throughout the story.",
+      "answer": "Initially, Tom 'wanted fame and fortune.' Later, he 'realized helping others mattered more than money' after volunteering."
+    },
+    {
+      "number": 9,
+      "question": "Analyze how the author uses evidence to support their argument about climate change. Cite specific examples from the text.",
+      "answer": "The author uses statistical evidence like '40% increase in storms' and expert testimony from 'Dr. Smith's research team.' These facts support the claim that climate change causes severe weather patterns."
+    },
+    {
+      "number": 10,
+      "question": "Make an inference about the story's theme using textual evidence. Explain how specific details support your interpretation.",
+      "answer": "The theme is perseverance overcomes obstacles. Maya 'failed three times but kept trying' and 'finally succeeded through hard work.' Her determination despite setbacks demonstrates this central message."
+    }
+  ]
+}

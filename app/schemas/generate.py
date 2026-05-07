@@ -11,6 +11,7 @@ class GenerateTemplateRequest(BaseModel):
     ela_standard_type: ELAStandardType | None = None
     ela_standard_code: str
     worldview_flag: WorldviewFlag = WorldviewFlag.NEUTRAL
+    use_bundle_context: bool = False  # If True, inject active bundle context into generation
 
     def model_post_init(self, __context: Any) -> None:
         # Derive ela_standard_type from ela_standard_code if not provided

@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 from app.core.config import settings
 from app.api.v1.routes import health, standards, products, generation_jobs, dashboard, templates
 from app.api.v1.routes import generate
+from app.api.v1.routes import bundle_context
 from app.utils.storage import storage_manager
 from app.utils.logger import logger
 
@@ -41,6 +42,7 @@ def create_app() -> FastAPI:
     app.include_router(standards.router, prefix="/api/v1/standards", tags=["standards"])
     app.include_router(generation_jobs.router, prefix="/api/v1/generation-jobs", tags=["generation-jobs"])
     app.include_router(templates.router, prefix="/api/v1", tags=["templates"])
+    app.include_router(bundle_context.router, prefix="/api/v1/bundle-context", tags=["bundle-context"])
     
     return app
 

@@ -1,0 +1,48 @@
+{
+  "verdict": "NEEDS_FIX",
+  "score": 68,
+  "issues": [
+    {
+      "category": "STRUCTURE",
+      "severity": "major",
+      "description": "Questions are generic and lack specific passage reference - they cannot be answered without an actual text to read"
+    },
+    {
+      "category": "ALIGNMENT",
+      "severity": "moderate",
+      "description": "While objectives align with RI.6.1, questions require a specific informational text to be meaningful and assessable"
+    },
+    {
+      "category": "CLARITY",
+      "severity": "major",
+      "description": "Multiple choice questions reference specific paragraphs and content that don't exist without an accompanying text passage"
+    },
+    {
+      "category": "DIFFICULTY",
+      "severity": "minor",
+      "description": "Question complexity appears appropriate for grade 6, but cannot be fully assessed without accompanying text"
+    },
+    {
+      "category": "ACCURACY",
+      "severity": "major",
+      "description": "Answer key provides correct answers to non-existent questions - answers reference content not provided to students"
+    },
+    {
+      "category": "STRUCTURE",
+      "severity": "moderate",
+      "description": "Missing essential component: the informational text passage that questions are based on"
+    }
+  ],
+  "strengths": [
+    "Appropriate progression from multiple choice to extended response",
+    "Good variety of question types targeting different aspects of RI.6.1",
+    "Clear formatting and organization",
+    "Extended response rubrics provide helpful guidance for teachers"
+  ],
+  "recommendations": [
+    "Include a complete informational text passage (300-500 words appropriate for grade 6)",
+    "Revise questions to reference specific, identifiable content from the provided passage",
+    "Update answer key to reflect actual passage content",
+    "Ensure all paragraph references in questions correspond to actual paragraphs in the text"
+  ]
+}

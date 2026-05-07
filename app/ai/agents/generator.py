@@ -111,7 +111,8 @@ class GeneratorAgent:
         ela_standard_type: str,
         ela_standard_code: str,
         worldview_flag: str,
-        curriculum: str
+        curriculum: str,
+        bundle_context: dict | None = None
     ) -> Dict[str, Any]:
         """Generate content using template-driven approach"""
         try:
@@ -126,6 +127,24 @@ class GeneratorAgent:
                 GradeLevel(str(grade_level)),
                 WorldviewFlag(worldview_flag)
             )
+            
+            # Inject bundle context for non-passage templates when available
+            if bundle_context and template_type != 'ANCHOR_READING_PASSAGE':
+                context_block = (
+                    f"\n\nBUNDLE COHESION CONTEXT (IMPORTANT):\n"
+                    f"This template is part of a bundle. Use the following shared context to ensure "
+                    f"all content is cohesive and references the same passage/topic:\n"
+                    f"- Passage Title: {bundle_context['passage_title']}\n"
+                    f"- Topic/Theme: {bundle_context['passage_topic']}\n"
+                )
+                if bundle_context.get('key_vocabulary'):
+                    context_block += f"- Key Vocabulary: {bundle_context['key_vocabulary']}\n"
+                context_block += (
+                    f"\nEnsure all questions, vocabulary, prompts, and content directly reference "
+                    f"or align with this passage and topic. Do NOT invent a different topic."
+                )
+                user_prompt += context_block
+                logger.info(f"Bundle context injected for product {product_id} (passage: '{bundle_context['passage_title']}')")
             
             # Use template-specific system prompt
             system_prompt = (

@@ -6,7 +6,8 @@ from app.schemas.generate import GenerateTemplateRequest, GenerateTemplateRespon
 from app.models.generation_job import GenerationJob
 from app.models.product import Product
 from app.models.standard import Standard
-from app.core.enums import JobType, JobStatus, ProductStatus
+from app.models.bundle_context import BundleContext
+from app.core.enums import JobType, JobStatus, ProductStatus, TemplateType
 from app.utils.logger import logger
 from app.utils.storage import storage_manager
 from app.utils.pdf_stub import generate_stub_pdf
@@ -91,7 +92,22 @@ async def generate_template(
         # AI Agent Orchestration for Template-Based Generation
         try:
             logger.info(f"Starting template-based AI generation for product {product.id}")
-            
+
+            # Fetch bundle context for this standard (if user opted in and one exists)
+            use_bundle_context = request.use_bundle_context
+            bundle_context_data = None
+            if use_bundle_context and request.template_type != TemplateType.ANCHOR_READING_PASSAGE:
+                ctx = db.query(BundleContext).filter(
+                    BundleContext.standard_id == request.standard_id
+                ).first()
+                if ctx:
+                    bundle_context_data = {
+                        'passage_title': ctx.passage_title,
+                        'passage_topic': ctx.passage_topic,
+                        'key_vocabulary': ctx.key_vocabulary,
+                    }
+                    logger.info(f"Using bundle context for product {product.id}: '{ctx.passage_title}'")
+
             # Step 1: Generate Template Content
             content = await generator_agent.generate_template_content(
                 product_id=product.id,
@@ -101,7 +117,8 @@ async def generate_template(
                 ela_standard_type=request.ela_standard_type.value,
                 ela_standard_code=request.ela_standard_code,
                 worldview_flag=request.worldview_flag.value,
-                curriculum=request.curriculum_board.value
+                curriculum=request.curriculum_board.value,
+                bundle_context=bundle_context_data
             )
             
             # Step 2: Quality Control with Christian Content Validation
@@ -137,6 +154,41 @@ async def generate_template(
             logger.info(f"Template {product.id} generated successfully (QC: {qc_result.get('verdict')} {qc_result.get('score')}%)")
             
             db.commit()
+
+            # If this was an Anchor Reading Passage, save/overwrite bundle context for this standard
+            if request.template_type == TemplateType.ANCHOR_READING_PASSAGE:
+                try:
+                    passage_title = content.get('title', '')
+                    passage_topic = content.get('main_theme', '')
+                    # Extract vocabulary terms from slide1_content or key_vocabulary
+                    vocab_raw = content.get('key_vocabulary', [])
+                    if isinstance(vocab_raw, list):
+                        key_vocabulary = ', '.join(vocab_raw[:8])
+                    else:
+                        # Try to parse from slide1_content
+                        slide1 = content.get('slide1_content', '')
+                        lines = [l.strip('• ').split(':')[0].strip() for l in slide1.split('\n') if l.strip().startswith('•')]
+                        key_vocabulary = ', '.join(lines[:8]) if lines else ''
+
+                    ctx = db.query(BundleContext).filter(
+                        BundleContext.standard_id == request.standard_id
+                    ).first()
+                    if ctx:
+                        ctx.passage_title = passage_title
+                        ctx.passage_topic = passage_topic
+                        ctx.key_vocabulary = key_vocabulary
+                    else:
+                        ctx = BundleContext(
+                            standard_id=request.standard_id,
+                            passage_title=passage_title,
+                            passage_topic=passage_topic,
+                            key_vocabulary=key_vocabulary,
+                        )
+                        db.add(ctx)
+                    db.commit()
+                    logger.info(f"Bundle context saved for standard {request.standard_id}: '{passage_title}'")
+                except Exception as ctx_error:
+                    logger.warning(f"Failed to save bundle context for standard {request.standard_id}: {ctx_error}")
             
             # Step 4: Generate PPTX for all supported templates
             if product.status == ProductStatus.GENERATED:
