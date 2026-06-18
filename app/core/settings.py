@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     
     # Claude AI Configuration
     claude_api_key: str = ""
-    claude_model: str = "claude-3-5-sonnet-20241022"
+    claude_model: str = "claude-sonnet-4-6"
     claude_timeout: int = 60
     claude_max_retries: int = 3
 
