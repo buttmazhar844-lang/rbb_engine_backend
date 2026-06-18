@@ -105,6 +105,7 @@ async def generate_template(
                         'passage_title': ctx.passage_title,
                         'passage_topic': ctx.passage_topic,
                         'key_vocabulary': ctx.key_vocabulary,
+                        'passage_text': ctx.passage_text,
                     }
                     logger.info(f"Using bundle context for product {product.id}: '{ctx.passage_title}'")
 
@@ -160,14 +161,15 @@ async def generate_template(
                 try:
                     passage_title = content.get('title', '')
                     passage_topic = content.get('main_theme', '')
-                    # Extract vocabulary terms from slide1_content or key_vocabulary
+                    # Full passage text for strict downstream context chaining
+                    passage_text = content.get('slide2_content', '') or content.get('passage_text', '')
+                    # Extract vocabulary terms
                     vocab_raw = content.get('key_vocabulary', [])
                     if isinstance(vocab_raw, list):
                         key_vocabulary = ', '.join(vocab_raw[:8])
                     else:
-                        # Try to parse from slide1_content
                         slide1 = content.get('slide1_content', '')
-                        lines = [l.strip('• ').split(':')[0].strip() for l in slide1.split('\n') if l.strip().startswith('•')]
+                        lines = [l.strip('\u2022 ').split(':')[0].strip() for l in slide1.split('\n') if l.strip().startswith('\u2022')]
                         key_vocabulary = ', '.join(lines[:8]) if lines else ''
 
                     ctx = db.query(BundleContext).filter(
@@ -177,16 +179,18 @@ async def generate_template(
                         ctx.passage_title = passage_title
                         ctx.passage_topic = passage_topic
                         ctx.key_vocabulary = key_vocabulary
+                        ctx.passage_text = passage_text
                     else:
                         ctx = BundleContext(
                             standard_id=request.standard_id,
                             passage_title=passage_title,
                             passage_topic=passage_topic,
                             key_vocabulary=key_vocabulary,
+                            passage_text=passage_text,
                         )
                         db.add(ctx)
                     db.commit()
-                    logger.info(f"Bundle context saved for standard {request.standard_id}: '{passage_title}'")
+                    logger.info(f"Bundle context saved for standard {request.standard_id}: '{passage_title}' ({len(passage_text)} chars)")
                 except Exception as ctx_error:
                     logger.warning(f"Failed to save bundle context for standard {request.standard_id}: {ctx_error}")
             
