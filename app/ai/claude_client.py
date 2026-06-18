@@ -14,7 +14,7 @@ class ClaudeClient:
         self.max_retries = settings.claude_max_retries
         self.base_url = "https://api.anthropic.com/v1/messages"
     
-    async def generate(self, system_prompt: str, user_prompt: str) -> str:
+    async def generate(self, system_prompt: str, user_prompt: str, temperature: float = 1.0) -> str:
         """Generate text using Claude with retries and error handling"""
         
         if not self.api_key:
@@ -29,6 +29,7 @@ class ClaudeClient:
         payload = {
             "model": self.model,
             "max_tokens": 4000,
+            "temperature": temperature,
             "system": system_prompt,
             "messages": [{"role": "user", "content": user_prompt}]
         }
