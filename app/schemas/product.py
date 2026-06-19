@@ -18,7 +18,18 @@ class ProductBase(BaseModel):
     seo_title: Optional[str] = None
     seo_description: Optional[str] = None
     internal_linking_block: Optional[str] = None
-    social_snippets: Optional[List[Dict[str, Any]]] = None
+    social_snippets: Optional[List[Any]] = None
+
+    @field_validator('social_snippets', mode='before')
+    @classmethod
+    def parse_social_snippets(cls, v):
+        if isinstance(v, str):
+            import json
+            try:
+                return json.loads(v)
+            except Exception:
+                return None
+        return v
 
 class ProductCreate(ProductBase):
     @field_validator('curriculum_board')
