@@ -1,5 +1,5 @@
 from typing import Dict, Any
-from .base import BaseTemplate, TemplateStructure, TemplateField
+from .base import BaseTemplate, TemplateStructure, TemplateField, LENGTH_CONTROL_INSTRUCTION
 from ..enums import TemplateType, WorldviewFlag, GradeLevel
 
 
@@ -14,7 +14,7 @@ class ExitTicketsTemplate(BaseTemplate):
                 TemplateField(name="title", type="string", max_length=100),
                 TemplateField(name="objectives", type="string", max_length=300),
                 TemplateField(name="directions", type="string", max_length=300),
-                TemplateField(name="tickets", type="array"),
+                TemplateField(name="tickets", type="array", min_items=3, max_items=4),
                 TemplateField(name="answer_key_title", type="string", max_length=100),
             ],
             christian_guidelines={},
@@ -31,10 +31,15 @@ class ExitTicketsTemplate(BaseTemplate):
         return f"""
 Generate Exit Tickets for ELA Standard {standard_code}, Grade {grade_level.value}.
 
+{LENGTH_CONTROL_INSTRUCTION}
+
 CRITICAL: The "title" field MUST be exactly "Exit Tickets". Do not change it.
 {"Apply a Christian worldview: questions should encourage reflection on values and character." if christian else ""}
 
-CRITICAL: Every field has a strict character limit. NEVER exceed it.
+TICKET COUNTS (STRICT):
+- tickets array: EXACTLY 3 or 4 exit tickets (no fewer, no more)
+- Each ticket question: concise, maximum 2 lines (max 150 chars)
+- teacher_notes / sample_answer: minimum 1 sentence, maximum 2 sentences
 
 FIELD LIMITS (characters including spaces):
 - title: exactly "Exit Tickets"
@@ -44,8 +49,8 @@ FIELD LIMITS (characters including spaces):
 - directions: max 220 chars (1-2 sentences)
 - answer_key_title: max 55 chars
 - Each ticket title: max 55 chars (Title Case)
-- Each ticket question: max 150 chars (1-2 sentences, fits in 2-line box)
-- Each ticket sample_answer: max 300 chars (2-3 sentences, fits in 4-line box)
+- Each ticket question: max 150 chars (concise, max 2 lines)
+- Each ticket sample_answer: max 200 chars (1-2 sentences)
 
 OUTPUT FORMAT (JSON only, no markdown):
 {{
@@ -56,11 +61,9 @@ OUTPUT FORMAT (JSON only, no markdown):
   "directions": "Answer the question below in complete sentences.",
   "answer_key_title": "Answer Key",
   "tickets": [
-    {{"number": 1, "title": "Ticket Title Here", "question": "Question text here?", "sample_answer": "Sample answer here."}},
-    {{"number": 2, "title": "Ticket Title Here", "question": "Question text here?", "sample_answer": "Sample answer here."}},
-    {{"number": 3, "title": "Ticket Title Here", "question": "Question text here?", "sample_answer": "Sample answer here."}},
-    {{"number": 4, "title": "Ticket Title Here", "question": "Question text here?", "sample_answer": "Sample answer here."}},
-    {{"number": 5, "title": "Ticket Title Here", "question": "Question text here?", "sample_answer": "Sample answer here."}}
+    {{"number": 1, "title": "Ticket Title Here", "question": "Question text here?", "sample_answer": "Sample answer (1-2 sentences)."}},
+    {{"number": 2, "title": "Ticket Title Here", "question": "Question text here?", "sample_answer": "Sample answer (1-2 sentences)."}},
+    {{"number": 3, "title": "Ticket Title Here", "question": "Question text here?", "sample_answer": "Sample answer (1-2 sentences)."}}
   ]
 }}
 """
