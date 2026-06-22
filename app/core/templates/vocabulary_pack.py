@@ -1,5 +1,5 @@
 from typing import Dict, Any
-from .base import BaseTemplate, TemplateStructure, TemplateField
+from .base import BaseTemplate, TemplateStructure, TemplateField, LENGTH_CONTROL_INSTRUCTION
 from ..enums import TemplateType, WorldviewFlag, GradeLevel
 
 
@@ -14,10 +14,10 @@ class VocabularyPackTemplate(BaseTemplate):
                 TemplateField(name="title", type="string", max_length=100),
                 TemplateField(name="objectives", type="string", max_length=300),
                 TemplateField(name="directions", type="string", max_length=300),
-                TemplateField(name="vocabulary_words", type="array"),
+                TemplateField(name="vocabulary_words", type="array", min_items=6, max_items=8),
                 TemplateField(name="quiz_header", type="string", max_length=100),
                 TemplateField(name="quiz_direction", type="string", max_length=200),
-                TemplateField(name="quiz_questions", type="array"),
+                TemplateField(name="quiz_questions", type="array", min_items=5, max_items=6),
                 TemplateField(name="answer_key_title", type="string", max_length=100),
             ],
             christian_guidelines={},
@@ -34,10 +34,18 @@ class VocabularyPackTemplate(BaseTemplate):
         return f"""
 Generate a Vocabulary Pack for ELA Standard {standard_code}, Grade {grade_level.value}.
 
+{LENGTH_CONTROL_INSTRUCTION}
+
 CRITICAL: The "title" field MUST be exactly "Vocabulary Pack". Do not change it.
 {"Apply a Christian worldview: choose words that reflect virtue, wisdom, and character." if christian else ""}
 
 CRITICAL: Every field has a strict character limit. NEVER exceed it.
+
+LENGTH REQUIREMENTS:
+- vocabulary_words: EXACTLY 6–8 words (no fewer, no more)
+- Each definition: 1 concise sentence (max 75 chars)
+- Each example sentence: 1 sentence per word (max 220 chars)
+- quiz_questions: EXACTLY 5–6 questions (no fewer, no more)
 
 FIELD LIMITS (characters including spaces):
 - title: exactly "Vocabulary Pack"
@@ -48,10 +56,10 @@ FIELD LIMITS (characters including spaces):
 - quiz_header: max 75 chars (e.g. "Vocabulary Quiz")
 - quiz_direction: max 75 chars (1 sentence)
 - answer_key_title: max 55 chars
-- Each word label: max 75 chars (format: "Word N: Term" using Camel Case, e.g. "Word 1: Parallel Structure")
-- Each definition: max 75 chars (one concise sentence — fits in 1-line box)
-- Each sentence: max 220 chars (1-2 sentences showing word in context — fits in 3-line box)
-- Each quiz question text: max 80 chars (short MCQ question)
+- Each word label: max 75 chars
+- Each definition: max 75 chars (1 concise sentence)
+- Each sentence: max 220 chars (1 sentence in context)
+- Each quiz question text: max 80 chars
 - Each quiz option (A/B/C/D): max 55 chars
 - Each quiz answer: max 75 chars (format: "C - Term")
 
@@ -71,19 +79,14 @@ OUTPUT FORMAT (JSON only, no markdown):
     {{"number": 3, "word": "Camel Case Term", "definition": "Concise definition here.", "sentence": "Example sentence using the term in context."}},
     {{"number": 4, "word": "Camel Case Term", "definition": "Concise definition here.", "sentence": "Example sentence using the term in context."}},
     {{"number": 5, "word": "Camel Case Term", "definition": "Concise definition here.", "sentence": "Example sentence using the term in context."}},
-    {{"number": 6, "word": "Camel Case Term", "definition": "Concise definition here.", "sentence": "Example sentence using the term in context."}},
-    {{"number": 7, "word": "Camel Case Term", "definition": "Concise definition here.", "sentence": "Example sentence using the term in context."}},
-    {{"number": 8, "word": "Camel Case Term", "definition": "Concise definition here.", "sentence": "Example sentence using the term in context."}},
-    {{"number": 9, "word": "Camel Case Term", "definition": "Concise definition here.", "sentence": "Example sentence using the term in context."}},
-    {{"number": 10, "word": "Camel Case Term", "definition": "Concise definition here.", "sentence": "Example sentence using the term in context."}}
+    {{"number": 6, "word": "Camel Case Term", "definition": "Concise definition here.", "sentence": "Example sentence using the term in context."}}
   ],
   "quiz_questions": [
     {{"number": 1, "question": "Short MCQ question?", "options": {{"A": "Option A", "B": "Option B", "C": "Option C", "D": "Option D"}}, "answer": "C - Term"}},
     {{"number": 2, "question": "Short MCQ question?", "options": {{"A": "Option A", "B": "Option B", "C": "Option C", "D": "Option D"}}, "answer": "A - Term"}},
     {{"number": 3, "question": "Short MCQ question?", "options": {{"A": "Option A", "B": "Option B", "C": "Option C", "D": "Option D"}}, "answer": "B - Term"}},
     {{"number": 4, "question": "Short MCQ question?", "options": {{"A": "Option A", "B": "Option B", "C": "Option C", "D": "Option D"}}, "answer": "D - Term"}},
-    {{"number": 5, "question": "Short MCQ question?", "options": {{"A": "Option A", "B": "Option B", "C": "Option C", "D": "Option D"}}, "answer": "C - Term"}},
-    {{"number": 6, "question": "Short MCQ question?", "options": {{"A": "Option A", "B": "Option B", "C": "Option C", "D": "Option D"}}, "answer": "A - Term"}}
+    {{"number": 5, "question": "Short MCQ question?", "options": {{"A": "Option A", "B": "Option B", "C": "Option C", "D": "Option D"}}, "answer": "C - Term"}}
   ]
 }}
 """
