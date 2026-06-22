@@ -1,5 +1,5 @@
 from typing import Dict, Any
-from .base import BaseTemplate, TemplateStructure, TemplateField
+from .base import BaseTemplate, TemplateStructure, TemplateField, LENGTH_CONTROL_INSTRUCTION
 from ..enums import TemplateType, WorldviewFlag, GradeLevel
 
 
@@ -16,7 +16,8 @@ class ReadingComprehensionQuestionsTemplate(BaseTemplate):
                 TemplateField(name="directions", type="string", max_length=300),
                 TemplateField(name="question_type_1_title", type="string", max_length=100),
                 TemplateField(name="question_type_2_title", type="string", max_length=100),
-                TemplateField(name="questions", type="array"),
+                # 4-5 MC + 2-3 short-answer + 1 extended = 7-9 total
+                TemplateField(name="questions", type="array", min_items=7, max_items=9),
                 TemplateField(name="answer_key_title", type="string", max_length=100),
             ],
             christian_guidelines={},
@@ -33,15 +34,15 @@ class ReadingComprehensionQuestionsTemplate(BaseTemplate):
         return f"""
 Generate Reading Comprehension Questions for ELA Standard {standard_code}, Grade {grade_level.value}.
 
+{LENGTH_CONTROL_INSTRUCTION}
+
 CRITICAL: The "title" field MUST be exactly "Reading Comprehension Questions". Do not change it.
 {"Apply a Christian worldview: themes of truth, wisdom, and character." if christian else ""}
 
-CRITICAL: Every field has a strict character limit. NEVER exceed it.
-
-QUESTION TYPES:
-- Questions 1-5: Multiple-choice with 4 options (A, B, C, D) — fits in a 5-line box at 10pt
-- Questions 6-8: Short-response (2-4 sentence answer)
-- Questions 9-10: Extended-response (paragraph answer)
+QUESTION TYPES AND COUNTS (STRICT):
+- Questions 1–4 or 1–5: Multiple-choice with 4 options (A, B, C, D) — EXACTLY 4 or 5 questions
+- Questions after MC: Short-response (2–3 questions) — answer explanations max 2 sentences each
+- Final question: Extended-response (EXACTLY 1 question) — answer max 2 sentences
 
 FIELD LIMITS (characters including spaces):
 - title: exactly "Reading Comprehension Questions"
@@ -49,16 +50,16 @@ FIELD LIMITS (characters including spaces):
 - tagline: max 65 chars (3 verb phrases separated by " | ")
 - objectives: max 220 chars (2 bullet points using •, one per line)
 - directions: max 300 chars (1-2 sentences)
-- question_type_1_title: max 75 chars (e.g. "Multiple Choice Questions")
-- question_type_2_title: max 75 chars (e.g. "Short & Extended Response")
+- question_type_1_title: max 75 chars
+- question_type_2_title: max 75 chars
 - answer_key_title: max 65 chars
-- Q1-5 question text: max 80 chars each (short enough to leave room for 4 options)
-- Q1-5 each option (A/B/C/D): max 60 chars each
-- Q1-5 answer: max 75 chars (format: "A - Answer text")
-- Q6-8 question text: max 120 chars
-- Q6-8 answer: max 300 chars (2-4 sentences)
-- Q9-10 question text: max 150 chars
-- Q9-10 answer: max 300 chars (paragraph)
+- MC question text: max 80 chars each
+- MC each option (A/B/C/D): max 60 chars each
+- MC answer: max 75 chars (format: "A - Answer text")
+- Short-response question text: max 120 chars
+- Short-response answer: max 200 chars (2 sentences max)
+- Extended-response question text: max 150 chars
+- Extended-response answer: max 200 chars (2 sentences max)
 
 OUTPUT FORMAT (JSON only, no markdown):
 {{
@@ -66,7 +67,7 @@ OUTPUT FORMAT (JSON only, no markdown):
   "bundle_title": "{standard_code} [Topic] Bundle",
   "tagline": "[Verb Phrase] | [Verb Phrase] | [Verb Phrase]",
   "objectives": "• Objective one\\n• Objective two",
-  "directions": "Read each question carefully. Choose the best answer for questions 1-5. Write your response for questions 6-10.",
+  "directions": "Read each question carefully. Choose the best answer for multiple choice questions. Write your response for short and extended questions.",
   "question_type_1_title": "Multiple Choice Questions",
   "question_type_2_title": "Short & Extended Response",
   "answer_key_title": "Answer Key",
@@ -75,12 +76,9 @@ OUTPUT FORMAT (JSON only, no markdown):
     {{"number": 2, "question": "Short MCQ question?", "options": {{"A": "Option A", "B": "Option B", "C": "Option C", "D": "Option D"}}, "answer": "B - Option B"}},
     {{"number": 3, "question": "Short MCQ question?", "options": {{"A": "Option A", "B": "Option B", "C": "Option C", "D": "Option D"}}, "answer": "C - Option C"}},
     {{"number": 4, "question": "Short MCQ question?", "options": {{"A": "Option A", "B": "Option B", "C": "Option C", "D": "Option D"}}, "answer": "D - Option D"}},
-    {{"number": 5, "question": "Short MCQ question?", "options": {{"A": "Option A", "B": "Option B", "C": "Option C", "D": "Option D"}}, "answer": "A - Option A"}},
-    {{"number": 6, "question": "Short response question?", "answer": "Model short answer here."}},
-    {{"number": 7, "question": "Short response question?", "answer": "Model short answer here."}},
-    {{"number": 8, "question": "Short response question?", "answer": "Model short answer here."}},
-    {{"number": 9, "question": "Extended response question?", "answer": "Model extended answer here."}},
-    {{"number": 10, "question": "Extended response question?", "answer": "Model extended answer here."}}
+    {{"number": 5, "question": "Short response question?", "answer": "Model short answer (max 2 sentences)."}},
+    {{"number": 6, "question": "Short response question?", "answer": "Model short answer (max 2 sentences)."}},
+    {{"number": 7, "question": "Extended response question?", "answer": "Model extended answer (max 2 sentences)."}}
   ]
 }}
 """
