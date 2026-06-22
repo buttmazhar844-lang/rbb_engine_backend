@@ -185,7 +185,22 @@ class GeneratorAgent:
 
             validation_errors = template.validate_content(content_data)
             if validation_errors:
-                logger.warning(f"Template validation issues for product {product_id}: {validation_errors}")
+                logger.warning(f"Length validation failed for product {product_id}: {validation_errors}. Regenerating with correction prompt.")
+                correction_prompt = (
+                    f"{user_prompt}\n\n"
+                    f"CORRECTION REQUIRED: Your previous output violated min/max length rules.\n"
+                    f"Violations: {'; '.join(validation_errors)}\n"
+                    f"Regenerate the entire output strictly within all specified minimum and maximum "
+                    f"length limits. Do not add or remove content beyond what the limits allow."
+                )
+                raw_output = await claude_client.generate(system_prompt, correction_prompt, temperature=0.5)
+                content_data = self._parse_json_response(raw_output)
+                second_errors = template.validate_content(content_data)
+                if second_errors:
+                    raise ValueError(
+                        f"Content length validation failed after regeneration for product {product_id}. "
+                        f"Violations: {'; '.join(second_errors)}"
+                    )
 
             storage_manager.save_json_file(product_id, "raw", content_data)
             logger.info(f"Template content generation completed for product {product_id}")
